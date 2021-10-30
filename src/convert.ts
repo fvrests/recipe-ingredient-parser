@@ -62,11 +62,8 @@ export function feach(
   n: number,
   language: SupportedLanguages,
 ): number[] {
-  const lang = i18nMap.get(language);
-  if (!lang) {
-    return [];
-  }
-  const {numbersSmall, numbersMagnitude} = lang;
+  const {numbersSmall, numbersMagnitude} = i18nMap[language];
+
   let x = numbersSmall[w];
   if (x != null) {
     g = g + x;
@@ -92,9 +89,13 @@ export function findQuantityAndConvertIfUnicode(
   ingredientLine: string,
   language: SupportedLanguages,
 ) {
+  const {joiner} = i18nMap[language];
+
   const numericAndFractionRegex = /^(\d+\/\d+)|(\d+\s\d+\/\d+)|(\d+.\d+)|\d+/g;
-  const numericRangeWithSpaceRegex =
-    /^(\d+\-\d+)|^(\d+\s\-\s\d+)|^(\d+\sto\s\d+)/g; // for ex: "1 to 2" or "1 - 2"
+  const numericRangeWithSpaceRegex = new RegExp(
+    `^(\\d+\\-\\d+)|^(\\d+\\s\\-\\s\\d+)|^(\\d+\\s${joiner}\\s\\d+)`,
+    'g',
+  ); // for ex: "1 to 2" or "1 - 2"
   const unicodeFractionRegex = /\d*[^\u0000-\u007F]+/g;
   const onlyUnicodeFraction = /[^\u0000-\u007F]+/g;
   const wordUntilSpace = /[^\s]+/g;
@@ -121,7 +122,7 @@ export function findQuantityAndConvertIfUnicode(
   // found a quantity range, for ex: "2 to 3"
   if (ingredientLine.match(numericRangeWithSpaceRegex)) {
     const quantity = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex)
-      .replace('to', '-')
+      .replace(joiner, '-')
       .split(' ')
       .join('');
     const restOfIngredient = ingredientLine

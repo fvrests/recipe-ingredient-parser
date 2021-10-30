@@ -15,16 +15,14 @@ export function toTasteRecognize(
   input: string,
   language: SupportedLanguages,
 ): [string, string, boolean] {
-  const lang = i18nMap.get(language);
+  const {toTaste} = i18nMap[language];
 
-  if (!lang) return ['', '', false];
-
-  for (const toTaste of lang.toTaste) {
-    const firstLetter = toTaste.match(/\b(\w)/g);
+  for (const toTasteItem of toTaste) {
+    const firstLetter = toTasteItem.match(/\b(\w)/g);
 
     if (firstLetter) {
       // checking the extended version
-      let regEx = new RegExp(toTaste, 'gi');
+      let regEx = new RegExp(toTasteItem, 'gi');
       if (input.match(regEx)) {
         return [
           (firstLetter.join('.') + '.').toLocaleLowerCase(),
@@ -49,11 +47,7 @@ export function toTasteRecognize(
 }
 
 function getUnit(input: string, language: SupportedLanguages): string[] {
-  const lang = i18nMap.get(language);
-  if (!lang) {
-    return [];
-  }
-  const {units, pluralUnits, symbolUnits} = lang;
+  const {units, pluralUnits, symbolUnits} = i18nMap[language];
   // const units = unit[0];
   // const pluralUnits = unit[1];
   // const symbolUnits = unit[3];
@@ -100,13 +94,8 @@ function getUnit(input: string, language: SupportedLanguages): string[] {
 /* return the proposition if it's used before of the name of
 the ingredient */
 function getPreposition(input: string, language: SupportedLanguages) {
-  const lang = i18nMap.get(language);
+  const {prepositions} = i18nMap[language];
 
-  if (!lang) {
-    return;
-  }
-
-  const {prepositions} = lang;
   for (const preposition of prepositions) {
     const regex = new RegExp('^' + preposition);
     if (convert.getFirstMatch(input, regex)) {
@@ -235,8 +224,8 @@ export function prettyPrintingPress(
       ((+whole !== 0 && typeof remainder !== 'undefined') || +whole > 1) &&
       unit
     ) {
-      const lang = i18nMap.get(language);
-      unit = lang?.pluralUnits[unit] || unit;
+      const lang = i18nMap[language];
+      unit = lang.pluralUnits[unit] || unit;
     }
   } else {
     return ingredient.ingredient;

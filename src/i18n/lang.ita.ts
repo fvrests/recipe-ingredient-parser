@@ -115,6 +115,8 @@ const symbolUnits = {
 
 const prepositions = ['di', "d'"];
 
+const joiner = 'o';
+
 const toTaste = ['quanto basta'];
 
 export const numbersSmall: {[key: string]: number} = {
@@ -177,6 +179,7 @@ export const LangIta: LanguageConfig = {
   pluralUnits,
   symbolUnits,
   prepositions,
+  joiner,
   toTaste,
   numbersSmall,
   numbersMagnitude,

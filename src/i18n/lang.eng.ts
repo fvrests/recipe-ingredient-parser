@@ -20,6 +20,7 @@ const units = {
   milliliter: ['milliliter', 'ml', 'ml.'],
   package: ['package', 'pkg', 'pkgs'],
   stick: ['stick', 'sticks'],
+  dozen: ['dozen'],
   piece: ['piece', 'pcs', 'pcs.'],
   pinch: ['pinch'],
   small: ['small'],
@@ -76,6 +77,8 @@ const symbolUnits = {
 
 const prepositions = ['of'];
 
+const joiner = 'to';
+
 const toTaste = ['to taste'];
 
 const numbersSmall: {[key: string]: number} = {
@@ -122,6 +125,7 @@ export const LangEng: LanguageConfig = {
   pluralUnits,
   symbolUnits,
   prepositions,
+  joiner,
   toTaste,
   numbersSmall,
   numbersMagnitude,
