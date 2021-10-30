@@ -8,9 +8,11 @@ This project was built on top of code written by [nsafai](https://github.com/nsa
 
 What's different from the original?
 
-- added support for the Italian language.
-- added support for numbers written in words (for example `six cups milk`)
-- added support for preposition before name of ingredient (for example `six cups of milk` or `sei tazze di latte`)
+- No longer uses the "natural" library
+- Works with Node.js, browser, React Native
+- Added support for the Italian and German languages.
+- Added support for numbers written in words (for example `six cups milk`)
+- Added support for preposition before name of ingredient (for example `six cups of milk` or `sei tazze di latte`)
 
 ## To install
 
@@ -74,6 +76,7 @@ Will return
 Languages currently supported:
 
 - English `eng`
+- German `deu`
 - Italian `ita`
 
 ### Unicode Fractions
