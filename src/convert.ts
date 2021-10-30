@@ -1,4 +1,4 @@
-import {numbersMap} from './numbers';
+import {i18nMap, SupportedLanguages} from './i18n';
 
 export function convertFromFraction(value: string) {
   // number comes in, for example: 1 1/3
@@ -43,7 +43,7 @@ const unicodeObj: {[key: string]: string} = {
   '⅑': '1/9',
   '⅒': '1/10',
 };
-export function text2num(s: string, language: string) {
+export function text2num(s: string, language: SupportedLanguages) {
   const a = s.toString().split(/[\s-]+/);
   let values: number[] = [0, 0];
   a.forEach(x => {
@@ -56,21 +56,28 @@ export function text2num(s: string, language: string) {
   }
 }
 
-export function feach(w: string, g: number, n: number, language: string) {
-  const number = numbersMap.get(language);
-  const small = number[0];
-  const magnitude = number[1];
-  let x = small[w];
+export function feach(
+  w: string,
+  g: number,
+  n: number,
+  language: SupportedLanguages,
+): number[] {
+  const lang = i18nMap.get(language);
+  if (!lang) {
+    return [];
+  }
+  const {numbersSmall, numbersMagnitude} = lang;
+  let x = numbersSmall[w];
   if (x != null) {
     g = g + x;
-  } else if (100 == magnitude[w]) {
+  } else if (100 == numbersMagnitude[w]) {
     if (g > 0) {
       g = g * 100;
     } else {
       g = 100;
     }
   } else {
-    x = magnitude[w];
+    x = numbersMagnitude[w];
     if (x != null) {
       n = n + g * x;
       g = 0;
@@ -83,7 +90,7 @@ export function feach(w: string, g: number, n: number, language: string) {
 
 export function findQuantityAndConvertIfUnicode(
   ingredientLine: string,
-  language: string,
+  language: SupportedLanguages,
 ) {
   const numericAndFractionRegex = /^(\d+\/\d+)|(\d+\s\d+\/\d+)|(\d+.\d+)|\d+/g;
   const numericRangeWithSpaceRegex =

@@ -1,7 +1,6 @@
 import * as convert from './convert';
-import {unitsMap} from './units';
+import {SupportedLanguages, i18nMap} from './i18n';
 import {repeatingFractions} from './repeatingFractions';
-import {toTasteMap} from './numbers';
 
 export interface Ingredient {
   ingredient: string;
@@ -14,43 +13,53 @@ export interface Ingredient {
 
 export function toTasteRecognize(
   input: string,
-  language: string,
+  language: SupportedLanguages,
 ): [string, string, boolean] {
-  const toTaste = toTasteMap[language];
-  const firstLetter = toTaste.match(/\b(\w)/g);
+  const lang = i18nMap.get(language);
 
-  if (firstLetter) {
-    // checking the extended version
-    let regEx = new RegExp(toTaste, 'gi');
-    if (input.match(regEx)) {
-      return [
-        (firstLetter.join('.') + '.').toLocaleLowerCase(),
-        convert.getFirstMatch(input, regEx),
-        true,
-      ];
-    }
-    const regExString = firstLetter.join('[.]?') + '[.]?';
-    regEx = new RegExp('(\\b' + regExString + '\\b)', 'gi');
-    // const a = input.toString().split(/[\s-]+/);
-    if (input.match(regEx)) {
-      return [
-        (firstLetter.join('.') + '.').toLocaleLowerCase(),
-        convert.getFirstMatch(input, regEx),
-        false,
-      ];
+  if (!lang) return ['', '', false];
+
+  for (const toTaste of lang.toTaste) {
+    const firstLetter = toTaste.match(/\b(\w)/g);
+
+    if (firstLetter) {
+      // checking the extended version
+      let regEx = new RegExp(toTaste, 'gi');
+      if (input.match(regEx)) {
+        return [
+          (firstLetter.join('.') + '.').toLocaleLowerCase(),
+          convert.getFirstMatch(input, regEx),
+          true,
+        ];
+      }
+      const regExString = firstLetter.join('[.]?') + '[.]?';
+      regEx = new RegExp('(\\b' + regExString + '\\b)', 'gi');
+      // const a = input.toString().split(/[\s-]+/);
+      if (input.match(regEx)) {
+        return [
+          (firstLetter.join('.') + '.').toLocaleLowerCase(),
+          convert.getFirstMatch(input, regEx),
+          false,
+        ];
+      }
     }
   }
+
   return ['', '', false];
 }
 
-function getUnit(input: string, language: string): string[] {
-  const unit = unitsMap.get(language);
-  const units = unit[0];
-  const pluralUnits = unit[1];
-  const symbolUnits = unit[3];
+function getUnit(input: string, language: SupportedLanguages): string[] {
+  const lang = i18nMap.get(language);
+  if (!lang) {
+    return [];
+  }
+  const {units, pluralUnits, symbolUnits} = lang;
+  // const units = unit[0];
+  // const pluralUnits = unit[1];
+  // const symbolUnits = unit[3];
   const [toTaste, toTasteMatch, _extFlag] = toTasteRecognize(input, language);
 
-  const res = (response: string[]) => {
+  const res = (response: any[]) => {
     const symbol = symbolUnits[response[0]];
     response.splice(2, 0, symbol);
     return response;
@@ -90,9 +99,14 @@ function getUnit(input: string, language: string): string[] {
 
 /* return the proposition if it's used before of the name of
 the ingredient */
-function getPreposition(input: string, language: string) {
-  const prepositionMap = unitsMap.get(language);
-  const prepositions = prepositionMap[2];
+function getPreposition(input: string, language: SupportedLanguages) {
+  const lang = i18nMap.get(language);
+
+  if (!lang) {
+    return;
+  }
+
+  const {prepositions} = lang;
   for (const preposition of prepositions) {
     const regex = new RegExp('^' + preposition);
     if (convert.getFirstMatch(input, regex)) {
@@ -103,7 +117,7 @@ function getPreposition(input: string, language: string) {
   return null;
 }
 
-export function parse(recipeString: string, language: string) {
+export function parse(recipeString: string, language: SupportedLanguages) {
   const ingredientLine = recipeString.trim(); // removes leading and trailing whitespace
 
   /* restOfIngredient represents rest of ingredient line.
@@ -185,7 +199,7 @@ export function combine(ingredientArray: Ingredient[]): Ingredient[] {
 
 export function prettyPrintingPress(
   ingredient: Ingredient,
-  language: string,
+  language: SupportedLanguages,
 ): string {
   let quantityString = '';
   let unit = ingredient.unit;
@@ -221,8 +235,8 @@ export function prettyPrintingPress(
       ((+whole !== 0 && typeof remainder !== 'undefined') || +whole > 1) &&
       unit
     ) {
-      const pluralUnits = unitsMap.get(language)[1];
-      unit = pluralUnits[unit];
+      const lang = i18nMap.get(language);
+      unit = lang?.pluralUnits[unit] || unit;
     }
   } else {
     return ingredient.ingredient;

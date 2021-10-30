@@ -1,80 +1,6 @@
-export const engUnits = {
-  bag: ['bag', 'bags'],
-  box: ['box'],
-  can: ['can'],
-  cup: ['cup', 'c', 'c.'],
-  clove: ['clove'],
-  gallon: ['gallon', 'gal'],
-  ounce: ['ounce', 'oz', 'oz.'],
-  pint: ['pint', 'pt', 'pts', 'pt.'],
-  pound: ['pound', 'lb', 'lb.', 'lbs', 'lbs.', 'Lb', 'Lbs'],
-  quart: ['quart', 'qt', 'qt.', 'qts', 'qts.'],
-  tablespoon: ['tablespoon', 'tbs', 'tbsp', 'tbspn'],
-  teaspoon: ['teaspoon', 'tsp', 'tspn', 't', 't.'],
-  gram: ['gram', 'g', 'g.'],
-  kilogram: ['kilogram', 'kg', 'kg.'],
-  liter: ['liter', 'l', 'l.', 'lt'],
-  milligram: ['milligram', 'mg', 'mg.'],
-  milliliter: ['milliliter', 'ml', 'ml.'],
-  package: ['package', 'pkg', 'pkgs'],
-  stick: ['stick', 'sticks'],
-  piece: ['piece', 'pcs', 'pcs.'],
-  pinch: ['pinch'],
-  small: ['small'],
-  slice: ['slice'],
-  medium: ['medium'],
-  large: ['large'],
-} as {[key: string]: string[]};
+import {LanguageConfig} from './interfaces';
 
-export const engPluralUnits = {
-  cup: 'cups',
-  gallon: 'gallons',
-  ounce: 'ounces',
-  pint: 'pints',
-  pound: 'pounds',
-  quart: 'quarts',
-  tablespoon: 'tablespoons',
-  teaspoon: 'teaspoons',
-  gram: 'grams',
-  kilogram: 'kilograms',
-  liter: 'liters',
-  milligram: 'milligrams',
-  milliliter: 'milliliters',
-  clove: 'cloves',
-  bag: 'bags',
-  box: 'boxes',
-  pinch: 'pinches',
-  can: 'cans',
-  slice: 'slices',
-  piece: 'pieces',
-} as {[key: string]: string};
-
-export const engNameToSymbol = {
-  cup: 'c',
-  gallon: 'gal',
-  ounce: 'oz',
-  pint: 'pt',
-  pound: 'lb',
-  quart: 'qt',
-  tablespoon: 'tbs',
-  teaspoon: 'tsp',
-  gram: 'g',
-  kilogram: 'kg',
-  liter: 'lt',
-  milligram: 'mg',
-  milliliter: 'ml',
-  clove: '',
-  bag: '',
-  box: '',
-  pinch: '',
-  can: '',
-  slice: '',
-  piece: '',
-} as {[key: string]: string};
-
-export const engPreposition = ['of'];
-
-export const itaUnits = {
+const units = {
   barattolo: ['barattolo', 'barattoli'],
   bicchiere: ['bicchiere'],
   bottiglia: ['bottiglie', 'bottiglia'],
@@ -122,7 +48,7 @@ export const itaUnits = {
   // noce: ['noce'],
 } as {[key: string]: string[]};
 
-export const itaPluralUnits = {
+const pluralUnits = {
   barattolo: 'barattoli',
   bicchiere: 'bicchieri',
   bustina: 'bustine',
@@ -163,7 +89,7 @@ export const itaPluralUnits = {
   // noce: 'noci'
 } as {[key: string]: string};
 
-export const itaNameToSymbol = {
+const symbolUnits = {
   bicchiere: '',
   bustina: '',
   tazza: '',
@@ -187,18 +113,71 @@ export const itaNameToSymbol = {
   millilitro: 'ml',
 } as {[key: string]: string};
 
-export const itaPreposition = ['di', "d'"];
+const prepositions = ['di', "d'"];
 
-export const unitsMap = new Map();
-unitsMap.set('eng', [
-  engUnits,
-  engPluralUnits,
-  engPreposition,
-  engNameToSymbol,
-]);
-unitsMap.set('ita', [
-  itaUnits,
-  itaPluralUnits,
-  itaPreposition,
-  itaNameToSymbol,
-]);
+const toTaste = ['quanto basta'];
+
+export const numbersSmall: {[key: string]: number} = {
+  zero: 0,
+  mezzo: 0.5,
+  mezza: 0.5,
+  metà: 0.5,
+  meta: 0.5,
+  uno: 1,
+  una: 1,
+  un: 1,
+  due: 2,
+  tre: 3,
+  quattro: 4,
+  cinque: 5,
+  sei: 6,
+  sette: 7,
+  otto: 8,
+  nove: 9,
+  dieci: 10,
+  undici: 11,
+  dodici: 12,
+  dozzina: 12,
+  tredici: 13,
+  quattordici: 14,
+  quindici: 15,
+  sedici: 16,
+  diciassette: 17,
+  diciotto: 18,
+  diciannove: 19,
+  venti: 20,
+  ventuno: 21,
+  trenta: 30,
+  trentuno: 31,
+  quaranta: 40,
+  quarantuno: 41,
+  cinquanta: 50,
+  cinquantuno: 51,
+  sessasanta: 60,
+  sessasantuno: 61,
+  settanta: 70,
+  settantuno: 71,
+  ottanta: 80,
+  ottantuno: 81,
+  novanta: 90,
+  novantuno: 91,
+};
+
+export const numbersMagnitude: {[key: string]: number} = {
+  cento: 100,
+  mille: 1000,
+  mila: 1000,
+  millione: 1000000,
+  milliardo: 1000000000,
+  trilliardo: 1000000000000,
+};
+
+export const LangIta: LanguageConfig = {
+  units,
+  pluralUnits,
+  symbolUnits,
+  prepositions,
+  toTaste,
+  numbersSmall,
+  numbersMagnitude,
+};
