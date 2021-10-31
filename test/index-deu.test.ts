@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {parse} from '../src/index';
 
-describe.only('recipe parser deu', () => {
+describe('recipe parser deu', () => {
   it('returns an object', () => {
     expect(typeof parse('1 tasse Wasser', 'deu')).to.equal('object');
   });

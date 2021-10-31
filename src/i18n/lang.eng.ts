@@ -77,7 +77,7 @@ const symbolUnits = {
 
 const prepositions = ['of'];
 
-const joiner = 'to';
+const joiners = ['to'];
 
 const toTaste = ['to taste'];
 
@@ -125,7 +125,7 @@ export const LangEng: LanguageConfig = {
   pluralUnits,
   symbolUnits,
   prepositions,
-  joiner,
+  joiners,
   toTaste,
   numbersSmall,
   numbersMagnitude,

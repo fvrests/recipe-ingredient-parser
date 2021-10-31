@@ -1,6 +1,6 @@
 import {i18nMap, SupportedLanguages} from './i18n';
 
-export function convertFromFraction(value: string) {
+export function convertFromFraction(value: string): string {
   // number comes in, for example: 1 1/3
   if (value && value.split(' ').length > 1) {
     const [whole, fraction] = value.split(' ');
@@ -89,11 +89,14 @@ export function findQuantityAndConvertIfUnicode(
   ingredientLine: string,
   language: SupportedLanguages,
 ) {
-  const {joiner} = i18nMap[language];
+  const {joiners} = i18nMap[language];
 
-  const numericAndFractionRegex = /^(\d+\/\d+)|(\d+\s\d+\/\d+)|(\d+.\d+)|\d+/g;
+  // Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"
+  const numericAndFractionRegex = /(\d+\/\d+|\d+\s\d+\/\d+|\d+,?\d*\.\d+|\d+)/g;
   const numericRangeWithSpaceRegex = new RegExp(
-    `^(\\d+\\-\\d+)|^(\\d+\\s\\-\\s\\d+)|^(\\d+\\s${joiner}\\s\\d+)`,
+    `^(\\d+\\-\\d+)|^(\\d+\\s\\-\\s\\d+)|^(\\d+\\s(?:${joiners.join(
+      '|',
+    )})\\s\\d+)`,
     'g',
   ); // for ex: "1 to 2" or "1 - 2"
   const unicodeFractionRegex = /\d*[^\u0000-\u007F]+/g;
@@ -122,7 +125,7 @@ export function findQuantityAndConvertIfUnicode(
   // found a quantity range, for ex: "2 to 3"
   if (ingredientLine.match(numericRangeWithSpaceRegex)) {
     const quantity = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex)
-      .replace(joiner, '-')
+      .replace(new RegExp(`${joiners.join('|')}`), '-')
       .split(' ')
       .join('');
     const restOfIngredient = ingredientLine

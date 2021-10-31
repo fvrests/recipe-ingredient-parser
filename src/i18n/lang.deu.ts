@@ -79,7 +79,7 @@ const symbolUnits = {
 } as {[key: string]: string};
 
 const prepositions = ['von'];
-const joiner = 'bis';
+const joiners = ['bis'];
 
 const toTaste: string[] = [];
 
@@ -130,7 +130,7 @@ export const LangDeu: LanguageConfig = {
   pluralUnits,
   symbolUnits,
   prepositions,
-  joiner,
+  joiners,
   toTaste,
   numbersSmall,
   numbersMagnitude,

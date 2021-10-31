@@ -106,6 +106,11 @@ function getPreposition(input: string, language: SupportedLanguages) {
   return null;
 }
 
+function convertToNumber(input: string): number {
+  if (!input) return 0;
+  return +input.replace(/,/, '');
+}
+
 export function parse(recipeString: string, language: SupportedLanguages) {
   const ingredientLine = recipeString.trim(); // removes leading and trailing whitespace
 
@@ -152,15 +157,15 @@ export function parse(recipeString: string, language: SupportedLanguages) {
   }
 
   return {
-    quantity: +quantity,
+    quantity: convertToNumber(quantity),
     unit: !!unit ? unit : null,
     unitPlural: !!unitPlural ? unitPlural : null,
     symbol: !!symbol ? symbol : null,
     ingredient: extraInfo
       ? `${ingredient} ${extraInfo}`
       : ingredient.replace(/( )*\.( )*/g, ''),
-    minQty: +minQty,
-    maxQty: +maxQty,
+    minQty: convertToNumber(minQty),
+    maxQty: convertToNumber(maxQty),
   };
 }
 

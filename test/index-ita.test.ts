@@ -291,7 +291,7 @@ describe('recipe parser ita', () => {
       });
     });
     it('"parses ingredient with range: 1 to 2 petto di pollo"', () => {
-      expect(parse('1 to 2 petto di pollo', 'ita')).to.deep.equal({
+      expect(parse('1 o 2 petto di pollo', 'ita')).to.deep.equal({
         unit: null,
         unitPlural: null,
         symbol: null,

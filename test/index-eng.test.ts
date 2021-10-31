@@ -50,6 +50,10 @@ describe('recipe parser eng', () => {
       expect(parse('about 1/2 teaspoon water', 'eng').quantity).to.equal(0.5);
     });
 
+    it('of "1,500.50 teaspoon water"', () => {
+      expect(parse('1,500.50 teaspoon water', 'eng').quantity).to.equal(1500.5);
+    });
+
     describe('translates the quantity from string to number', () => {
       it('one teaspoon water"', () => {
         expect(parse('one teaspoon water', 'eng').quantity).to.equal(1);
