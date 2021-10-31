@@ -55,6 +55,9 @@ describe('recipe parser eng', () => {
     });
 
     describe('translates the quantity from string to number', () => {
+      it('zero teaspoon water"', () => {
+        expect(parse('zero teaspoon water', 'eng').quantity).to.equal(0);
+      });
       it('one teaspoon water"', () => {
         expect(parse('one teaspoon water', 'eng').quantity).to.equal(1);
       });

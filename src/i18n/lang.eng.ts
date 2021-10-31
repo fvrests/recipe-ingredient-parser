@@ -129,4 +129,5 @@ export const LangEng: LanguageConfig = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  isCommaDelimited: false,
 };

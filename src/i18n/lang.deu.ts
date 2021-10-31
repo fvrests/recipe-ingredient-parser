@@ -134,4 +134,5 @@ export const LangDeu: LanguageConfig = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  isCommaDelimited: true,
 };

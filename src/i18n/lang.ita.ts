@@ -183,4 +183,5 @@ export const LangIta: LanguageConfig = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  isCommaDelimited: true,
 };

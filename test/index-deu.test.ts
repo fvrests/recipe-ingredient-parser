@@ -10,8 +10,8 @@ describe('recipe parser deu', () => {
     it('of "1 tealöffel wasser"', () => {
       expect(parse('1 teelöffel Wasser', 'deu').quantity).to.equal(1);
     });
-    it('of "1.5 teelöffel Wasser"', () => {
-      expect(parse('1.5 teelöffel Wasser', 'deu').quantity).to.equal(1.5);
+    it('of "1,5 teelöffel Wasser"', () => {
+      expect(parse('1,5 teelöffel Wasser', 'deu').quantity).to.equal(1.5);
     });
     it('of "1 1/2 teelöffel Wasser"', () => {
       expect(parse('1 1/2 teelöffel Wasser', 'deu').quantity).to.equal(1.5);

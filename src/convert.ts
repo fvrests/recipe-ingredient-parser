@@ -1,6 +1,20 @@
 import {i18nMap, SupportedLanguages} from './i18n';
 
-export function convertFromFraction(value: string): string {
+function keepThreeDecimals(val: number, delimiter: string) {
+  const strVal = val.toString();
+  return (
+    strVal.split('.')[0] + delimiter + strVal.split('.')[1].substring(0, 3)
+  );
+}
+
+export function convertFromFraction(
+  value: string,
+  language: SupportedLanguages,
+): string {
+  const {isCommaDelimited} = i18nMap[language];
+
+  const delimiter = isCommaDelimited ? ',' : '.';
+
   // number comes in, for example: 1 1/3
   if (value && value.split(' ').length > 1) {
     const [whole, fraction] = value.split(' ');
@@ -9,12 +23,12 @@ export function convertFromFraction(value: string): string {
     const wholeAndFraction = parseInt(whole)
       ? parseInt(whole) + remainder
       : remainder;
-    return keepThreeDecimals(wholeAndFraction);
+    return keepThreeDecimals(wholeAndFraction, delimiter);
   } else if (!value || value.split('-').length > 1) {
     return value;
   } else {
     const [a, b] = value.split('/');
-    return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b)) : a;
+    return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : a;
   }
 }
 
@@ -89,10 +103,18 @@ export function findQuantityAndConvertIfUnicode(
   ingredientLine: string,
   language: SupportedLanguages,
 ) {
-  const {joiners} = i18nMap[language];
+  const {joiners, isCommaDelimited} = i18nMap[language];
 
   // Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"
-  const numericAndFractionRegex = /(\d+\/\d+|\d+\s\d+\/\d+|\d+,?\d*\.\d+|\d+)/g;
+
+  const delimiter = isCommaDelimited ? ',' : '\\.';
+  const magnitudeSeperator = isCommaDelimited ? '\\.' : ',';
+
+  const numericAndFractionRegex = new RegExp(
+    `(\\d+\\/\\d+|\\d+\\s\\d+\\/\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`,
+    'g',
+  );
+
   const numericRangeWithSpaceRegex = new RegExp(
     `^(\\d+\\-\\d+)|^(\\d+\\s\\-\\s\\d+)|^(\\d+\\s(?:${joiners.join(
       '|',
@@ -104,7 +126,8 @@ export function findQuantityAndConvertIfUnicode(
   const wordUntilSpace = /[^\s]+/g;
 
   // found a unicode quantity inside our regex, for ex: '⅝'
-  if (ingredientLine.match(unicodeFractionRegex)) {
+  const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
+  if (unicodeQuantityMatch) {
     const numericPart = getFirstMatch(ingredientLine, numericAndFractionRegex);
     const unicodePart = getFirstMatch(
       ingredientLine,
@@ -123,7 +146,8 @@ export function findQuantityAndConvertIfUnicode(
   }
 
   // found a quantity range, for ex: "2 to 3"
-  if (ingredientLine.match(numericRangeWithSpaceRegex)) {
+  const quantityRangeMatch = ingredientLine.match(numericRangeWithSpaceRegex);
+  if (quantityRangeMatch) {
     const quantity = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex)
       .replace(new RegExp(`${joiners.join('|')}`), '-')
       .split(' ')
@@ -131,42 +155,35 @@ export function findQuantityAndConvertIfUnicode(
     const restOfIngredient = ingredientLine
       .replace(getFirstMatch(ingredientLine, numericRangeWithSpaceRegex), '')
       .trim();
-    return [
-      ingredientLine.match(numericRangeWithSpaceRegex) && quantity,
-      restOfIngredient,
-    ];
+    return [quantity, restOfIngredient];
   }
 
   // found a numeric/fraction quantity, for example: "1 1/3"
-  if (ingredientLine.match(numericAndFractionRegex)) {
+  const numericFractionMatch = ingredientLine.match(numericAndFractionRegex);
+  if (numericFractionMatch) {
     const quantity = getFirstMatch(ingredientLine, numericAndFractionRegex);
     const restOfIngredient = ingredientLine
       .replace(getFirstMatch(ingredientLine, numericAndFractionRegex), '')
       .trim();
-    return [
-      ingredientLine.match(numericAndFractionRegex) && quantity,
-      restOfIngredient,
-    ];
-  } else if (ingredientLine.match(wordUntilSpace)) {
+    return [quantity, restOfIngredient];
+  }
+
+  // found a word which we can test for numeric value
+  const wordUntilSpaceMatch = ingredientLine.match(wordUntilSpace);
+  if (wordUntilSpaceMatch) {
     const quantity = getFirstMatch(ingredientLine, wordUntilSpace);
     const quantityNumber = text2num(quantity.toLowerCase(), language);
     if (quantityNumber) {
       const restOfIngredient = ingredientLine
         .replace(getFirstMatch(ingredientLine, wordUntilSpace), '')
         .trim();
-      return [
-        ingredientLine.match(wordUntilSpace) && quantityNumber + '',
-        restOfIngredient,
-      ];
-    } else {
-      return [null, ingredientLine];
+      const quantityString = isCommaDelimited
+        ? `${quantityNumber}`.replace('.', ',')
+        : `${quantityNumber}`;
+      return [quantityString, restOfIngredient];
     }
-  } else {
     return [null, ingredientLine];
   }
-}
 
-function keepThreeDecimals(val: number) {
-  const strVal = val.toString();
-  return strVal.split('.')[0] + '.' + strVal.split('.')[1].substring(0, 3);
+  return [null, ingredientLine];
 }

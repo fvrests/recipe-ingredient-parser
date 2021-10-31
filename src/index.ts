@@ -48,9 +48,6 @@ export function toTasteRecognize(
 
 function getUnit(input: string, language: SupportedLanguages): string[] {
   const {units, pluralUnits, symbolUnits} = i18nMap[language];
-  // const units = unit[0];
-  // const pluralUnits = unit[1];
-  // const symbolUnits = unit[3];
   const [toTaste, toTasteMatch, _extFlag] = toTasteRecognize(input, language);
 
   const res = (response: any[]) => {
@@ -106,9 +103,11 @@ function getPreposition(input: string, language: SupportedLanguages) {
   return null;
 }
 
-function convertToNumber(input: string): number {
+function convertToNumber(input: string, language: SupportedLanguages): number {
+  const {isCommaDelimited} = i18nMap[language];
   if (!input) return 0;
-  return +input.replace(/,/, '');
+
+  return +input.replace(isCommaDelimited ? /\./ : /,/, '').replace(/,/, '.');
 }
 
 export function parse(recipeString: string, language: SupportedLanguages) {
@@ -120,7 +119,7 @@ export function parse(recipeString: string, language: SupportedLanguages) {
     ingredientLine,
     language,
   ) as string[];
-  quantity = convert.convertFromFraction(quantity);
+  quantity = convert.convertFromFraction(quantity, language);
 
   /* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
   For example: "sugar (or other sweetener)" --> extraInfo: "(or other sweetener)" */
@@ -157,15 +156,15 @@ export function parse(recipeString: string, language: SupportedLanguages) {
   }
 
   return {
-    quantity: convertToNumber(quantity),
+    quantity: convertToNumber(quantity, language),
     unit: !!unit ? unit : null,
     unitPlural: !!unitPlural ? unitPlural : null,
     symbol: !!symbol ? symbol : null,
     ingredient: extraInfo
       ? `${ingredient} ${extraInfo}`
       : ingredient.replace(/( )*\.( )*/g, ''),
-    minQty: convertToNumber(minQty),
-    maxQty: convertToNumber(maxQty),
+    minQty: convertToNumber(minQty, language),
+    maxQty: convertToNumber(maxQty, language),
   };
 }
 

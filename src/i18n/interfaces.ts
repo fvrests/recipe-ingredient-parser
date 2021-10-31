@@ -7,4 +7,5 @@ export type LanguageConfig = {
   toTaste: string[];
   numbersSmall: {[key: string]: number};
   numbersMagnitude: {[key: string]: number};
+  isCommaDelimited: boolean;
 };

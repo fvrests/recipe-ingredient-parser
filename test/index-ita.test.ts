@@ -54,8 +54,8 @@ describe('recipe parser ita', () => {
     it('of "1 cucchiao acqua"', () => {
       expect(parse('1 cucchiao acqua', 'ita').quantity).to.equal(1);
     });
-    it('of "1.5 cucchiao acqua"', () => {
-      expect(parse('1.5 cucchiao acqua', 'ita').quantity).to.equal(1.5);
+    it('of "1,5 cucchiao acqua"', () => {
+      expect(parse('1,5 cucchiao acqua', 'ita').quantity).to.equal(1.5);
     });
     it('of "1 1/2 cucchiao acqua"', () => {
       expect(parse('1 1/2 cucchiao acqua', 'ita').quantity).to.equal(1.5);
