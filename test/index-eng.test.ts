@@ -147,15 +147,15 @@ describe('recipe parser eng', () => {
         '7⅓',
         '8⅔',
         '9⅕',
-        '10⅖',
-        '11⅗',
-        '12⅘',
-        '13⅙',
-        '14⅚',
-        '15⅛',
-        '16⅜',
-        '17⅝',
-        '18⅞',
+        '10 ⅖',
+        '11 ⅗',
+        '12 ⅘',
+        '13 ⅙',
+        '14 ⅚',
+        '15 ⅛',
+        '16 ⅜',
+        '17 ⅝',
+        '18 ⅞',
       ];
       const mixedExpectedValues = [
         '1',
@@ -199,6 +199,28 @@ describe('recipe parser eng', () => {
         ingredient: 'confectioners’ sugar',
         minQty: 0.333,
         maxQty: 0.333,
+      });
+    });
+
+    it('correctly removes unicode value from ingredient', () => {
+      expect(parse('2 ½ cup confectioners’ sugar', 'eng')).to.deep.equal({
+        quantity: 2.5,
+        unit: 'cup',
+        unitPlural: 'cups',
+        symbol: 'c',
+        ingredient: 'confectioners’ sugar',
+        minQty: 2.5,
+        maxQty: 2.5,
+      });
+
+      expect(parse('2½ cup confectioners’ sugar', 'eng')).to.deep.equal({
+        quantity: 2.5,
+        unit: 'cup',
+        unitPlural: 'cups',
+        symbol: 'c',
+        ingredient: 'confectioners’ sugar',
+        minQty: 2.5,
+        maxQty: 2.5,
       });
     });
   });

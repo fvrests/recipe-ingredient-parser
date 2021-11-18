@@ -121,26 +121,23 @@ export function findQuantityAndConvertIfUnicode(
     )})\\s\\d+)`,
     'g',
   ); // for ex: "1 to 2" or "1 - 2"
-  const unicodeFractionRegex = /\d*[^\u0000-\u007F]+/g;
-  const onlyUnicodeFraction = /[^\u0000-\u007F]+/g;
+  // const unicodeFractionRegex = /(\d*)\s*([^\u0000-\u007F]+)/g;
+  const unicodeFractionRegex = new RegExp(
+    `(\\d*)\\s*(${Object.keys(unicodeObj).join('|')})`,
+    '',
+  );
   const wordUntilSpace = /[^\s]+/g;
 
   // found a unicode quantity inside our regex, for ex: '⅝'
   const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
   if (unicodeQuantityMatch) {
-    const numericPart = getFirstMatch(ingredientLine, numericAndFractionRegex);
-    const unicodePart = getFirstMatch(
-      ingredientLine,
-      numericPart ? onlyUnicodeFraction : unicodeFractionRegex,
-    );
+    const [str, numericPart, unicodePart] = unicodeQuantityMatch;
 
     // If there's a match for the unicodePart in our dictionary above
     if (unicodeObj[unicodePart]) {
       return [
         `${numericPart} ${unicodeObj[unicodePart]}`,
-        ingredientLine
-          .replace(getFirstMatch(ingredientLine, unicodeFractionRegex), '')
-          .trim(),
+        ingredientLine.replace(str, '').trim(),
       ];
     }
   }
