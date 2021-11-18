@@ -325,13 +325,13 @@ describe('recipe parser deu', () => {
       expect(parse('2 lbs Wasser', 'deu').unit).to.equal('Pfund');
       expect(parse('2 pfund Wasser', 'deu').unit).to.equal('Pfund');
     });
-    it('"1 esslöffel Wasser"', () => {
-      expect(parse('1 el Wasser', 'deu').unit).to.equal('Esslöffel');
-      expect(parse('1 EL Wasser', 'deu').unit).to.equal('Esslöffel');
-      expect(parse('1 el. Wasser', 'deu').unit).to.equal('Esslöffel');
-      expect(parse('2 esslöffels Wasser', 'deu').unit).to.equal('Esslöffel');
-      expect(parse('1 esslöffel Wasser', 'deu').unit).to.equal('Esslöffel');
-      expect(parse('2 esslöffels Wasser', 'deu').unit).to.equal('Esslöffel');
+    it('"1 esslöffel Öl"', () => {
+      expect(parse('1 el Öl', 'deu').unit).to.equal('Esslöffel');
+      expect(parse('1 EL Öl', 'deu').unit).to.equal('Esslöffel');
+      expect(parse('1 El Öl', 'deu').unit).to.equal('Esslöffel');
+      expect(parse('1 el. Öl', 'deu').unit).to.equal('Esslöffel');
+      expect(parse('2 esslöffel Öl', 'deu').unit).to.equal('Esslöffel');
+      expect(parse('1 esslöffel Öl', 'deu').unit).to.equal('Esslöffel');
     });
     it('"1 teelöffel Wasser"', () => {
       expect(parse('1 tl Wasser', 'deu').unit).to.equal('Teelöffel');

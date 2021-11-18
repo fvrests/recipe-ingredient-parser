@@ -67,9 +67,10 @@ function getUnit(input: string, language: SupportedLanguages): string[] {
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
       const regex = new RegExp(
-        '(\\b' + shorthand.replace(/\./g, '\\.') + '\\b)',
+        '((?:^|\\s)' + shorthand.replace(/\./g, '\\.') + '(?:$|\\s))',
         'gi',
       );
+
       const match = input.match(regex);
       if (match) {
         return res([unit, pluralUnits[unit], match[0]]);
