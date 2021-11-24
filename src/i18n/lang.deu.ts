@@ -24,6 +24,7 @@ const units = {
   Stange: ['stangen', 'stange', 'stange(n)', 'stange/n'],
   Schuss: ['schuss', 'schusse', 'schuss(e)', 'schuss/e'],
   Flasche: ['flaschen', 'flasche', 'flasche(n)', 'flasche/n'],
+  Bund: ['bund', 'bunde', 'bund(e)', 'bund/e'],
 } as {[key: string]: string[]};
 
 const pluralUnits = {
@@ -50,6 +51,7 @@ const pluralUnits = {
   Stange: 'Stagen',
   Schuss: 'Schusse',
   Flasche: 'Flaschen',
+  Bund: 'Bunde',
 } as {[key: string]: string};
 
 const symbolUnits = {
@@ -76,6 +78,7 @@ const symbolUnits = {
   Stange: '',
   Schuss: '',
   Flasche: '',
+  Bund: '',
 } as {[key: string]: string};
 
 const prepositions = ['von'];

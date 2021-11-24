@@ -1,10 +1,6 @@
 import {LanguageConfig} from './interfaces';
 
 const units = {
-  bag: ['bag', 'bags'],
-  box: ['box'],
-  can: ['can'],
-  cup: ['cup', 'c', 'c.'],
   clove: ['clove'],
   gallon: ['gallon', 'gal'],
   ounce: ['ounce', 'oz', 'oz.'],
@@ -19,14 +15,20 @@ const units = {
   milligram: ['milligram', 'mg', 'mg.'],
   milliliter: ['milliliter', 'ml', 'ml.'],
   package: ['package', 'pkg', 'pkgs'],
+  bag: ['bag', 'bags'],
+  box: ['box'],
+  can: ['can'],
+  cup: ['cup', 'c', 'c.'],
   stick: ['stick', 'sticks'],
   dozen: ['dozen'],
   piece: ['piece', 'pcs', 'pcs.'],
   pinch: ['pinch'],
-  small: ['small'],
   slice: ['slice'],
+  small: ['small'],
   medium: ['medium'],
   large: ['large'],
+  handful: ['handful'],
+  inch: ['inch'],
 } as {[key: string]: string[]};
 
 const pluralUnits = {
@@ -50,6 +52,12 @@ const pluralUnits = {
   can: 'cans',
   slice: 'slices',
   piece: 'pieces',
+  stick: 'sticks',
+  small: 'small',
+  medium: 'medium',
+  large: 'large',
+  handful: 'handfuls',
+  inch: 'inches',
 } as {[key: string]: string};
 
 const symbolUnits = {
@@ -73,6 +81,9 @@ const symbolUnits = {
   can: '',
   slice: '',
   piece: '',
+  stick: '',
+  handful: '',
+  inch: '',
 } as {[key: string]: string};
 
 const prepositions = ['of'];
