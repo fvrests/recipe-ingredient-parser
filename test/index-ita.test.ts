@@ -547,245 +547,245 @@ describe("recipe parser ita", () => {
 		});
 	});
 
-	it("translates unit when no unit provided", () => {
-		expect(parse("1 tortilla", "ita")).to.deep.equal({
-			unit: null,
-			unitPlural: null,
-			symbol: null,
-			ingredient: "tortilla",
-			quantity: 1,
-			minQty: 1,
-			maxQty: 1,
-		});
-	});
-	it("test order and case sensitive", () => {
-		expect(parse("100 ml. tortilla ", "ita")).to.deep.equal({
-			unit: "millilitro",
-			unitPlural: "millilitri",
-			symbol: "ml",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("100 mg. tortilla ", "ita")).to.deep.equal({
-			unit: "milligrammo",
-			unitPlural: "milligrammi",
-			symbol: "mg",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("100 g. tortilla ", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("1 g. d' acqua", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "acqua",
-			quantity: 1,
-			minQty: 1,
-			maxQty: 1,
-		});
-		expect(parse("100 g. di tortilla ", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("q.b. di sale", "ita")).to.deep.equal({
-			unit: "q.b.",
-			unitPlural: "q.b.",
-			symbol: null,
-			ingredient: "sale",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
-		});
-		expect(parse("100 gr. tortilla ", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("tortilla 100 gr.", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "tortilla",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-		expect(parse("basilico quanto basta", "ita")).to.deep.equal({
-			unit: "q.b.",
-			unitPlural: "q.b.",
-			symbol: null,
-			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
-		});
-		expect(parse("basilico q.b.", "ita")).to.deep.equal({
-			unit: "q.b.",
-			unitPlural: "q.b.",
-			symbol: null,
-			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
-		});
-		expect(parse("basilico QB", "ita")).to.deep.equal({
-			unit: "q.b.",
-			unitPlural: "q.b.",
-			symbol: null,
-			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
-		});
-		expect(parse("basilico millilitri 100", "ita")).to.deep.equal({
-			unit: "millilitro",
-			unitPlural: "millilitri",
-			symbol: "ml",
-			ingredient: "basilico",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-	});
-	it("doesn't explode when no unit and no quantity provided", () => {
-		expect(parse("zucchero a velo", "ita")).to.deep.equal({
-			unit: null,
-			unitPlural: null,
-			symbol: null,
-			ingredient: "zucchero a velo",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
-		});
-	});
-	it("test noci", () => {
-		expect(parse("quattro noci", "ita")).to.deep.equal({
-			unit: null,
-			unitPlural: null,
-			symbol: null,
-			ingredient: "noci",
-			quantity: 4,
-			minQty: 4,
-			maxQty: 4,
-		});
-		expect(parse("una noce", "ita")).to.deep.equal({
-			unit: null,
-			unitPlural: null,
-			symbol: null,
-			ingredient: "noce",
-			quantity: 1,
-			minQty: 1,
-			maxQty: 1,
-		});
-		expect(parse("100 gr di noci", "ita")).to.deep.equal({
-			unit: "grammo",
-			unitPlural: "grammi",
-			symbol: "g",
-			ingredient: "noci",
-			quantity: 100,
-			minQty: 100,
-			maxQty: 100,
-		});
-	});
-	describe("translates the abbreviated units of", () => {
-		it('"1 tazza acqua"', () => {
-			expect(parse("1 tazza acqua", "ita").unit).to.equal("tazza");
-			expect(parse("2 tazzine acqua", "ita").unit).to.equal("tazza");
-			expect(parse("2 tazze acqua", "ita").unit).to.equal("tazza");
-		});
-		it('"1 litro acqua"', () => {
-			expect(parse("1 l acqua", "ita").unit).to.equal("litro");
-			expect(parse("1 litri acqua", "ita").unit).to.equal("litro");
-		});
-		it('"1 grammo acqua"', () => {
-			expect(parse("1 gr acqua", "ita").unit).to.equal("grammo");
-			expect(parse("2 g acqua", "ita").unit).to.equal("grammo");
-			expect(parse("2 g. acqua", "ita").ingredient).to.equal("acqua");
-		});
-		it('"1 chilogrammo acqua"', () => {
-			expect(parse("1 kg acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("2 KG acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("1 kilogrammo acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("2 Kilogrammo acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("acqua KILOGRAMMO 2", "ita").unit).to.equal("chilogrammo");
-			expect(parse("acqua KILOGRAMMO due", "ita").unit).to.equal("chilogrammo");
-		});
-		it('"1 tazza acqua"', () => {
-			expect(parse("1 tazza acqua", "ita").unit).to.equal("tazza");
-			expect(parse("1 tazzina acqua", "ita").unit).to.equal("tazza");
-			expect(parse("2 tazzine acqua", "ita").unit).to.equal("tazza");
-			expect(parse("2 Tazza acqua", "ita").unit).to.equal("tazza");
-		});
-		it('"1 millilitro acqua"', () => {
-			expect(parse("1 ml acqua", "ita").unit).to.equal("millilitro");
-			expect(parse("1 ml. acqua", "ita").unit).to.equal("millilitro");
-			expect(parse("1 millilitro acqua", "ita").unit).to.equal("millilitro");
-			expect(parse("1 Millilitro acqua", "ita").unit).to.equal("millilitro");
-		});
-		it('"1 cucchiaio acqua"', () => {
-			expect(parse("2 cucchiai acqua", "ita").unit).to.equal("cucchiaio");
-			expect(parse("1 Cucchiaio acqua", "ita").unit).to.equal("cucchiaio");
-			expect(parse("2 cucchiai acqua", "ita").unit).to.equal("cucchiaio");
-		});
-		it('"1 cucchiaino acqua"', () => {
-			expect(parse("1 Cucchiaino acqua", "ita").unit).to.equal("cucchiaino");
-			expect(parse("1 cucchiaino acqua", "ita").unit).to.equal("cucchiaino");
-			expect(parse("2 Cucchiaini acqua", "ita").unit).to.equal("cucchiaino");
-			expect(parse("2 cucchiaini acqua", "ita").unit).to.equal("cucchiaino");
-		});
-		it('"1 grammo acqua"', () => {
-			expect(parse("1 g acqua", "ita").unit).to.equal("grammo");
-			expect(parse("1 g. acqua", "ita").unit).to.equal("grammo");
-			expect(parse("2 grammi acqua", "ita").unit).to.equal("grammo");
-		});
-		it('"1 chilogrammo acqua"', () => {
-			expect(parse("1 kg acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("1 kg. acqua", "ita").unit).to.equal("chilogrammo");
-			expect(parse("2 chilogrammi acqua", "ita").unit).to.equal("chilogrammo");
-		});
-		it('"1 litro acqua"', () => {
-			expect(parse("1 l acqua", "ita").unit).to.equal("litro");
-			expect(parse("1 l. acqua", "ita").unit).to.equal("litro");
-			expect(parse("2 litri acqua", "ita").unit).to.equal("litro");
-		});
-		it('"1 milligrammo acqua"', () => {
-			expect(parse("1 mg acqua", "ita").unit).to.equal("milligrammo");
-			expect(parse("1 mg. acqua", "ita").unit).to.equal("milligrammo");
-			expect(parse("1 milligrammo acqua", "ita").unit).to.equal("milligrammo");
-		});
-		it('"1 millilitro acqua"', () => {
-			expect(parse("1 ml acqua", "ita").unit).to.equal("millilitro");
-			expect(parse("1 ml. acqua", "ita").unit).to.equal("millilitro");
-			expect(parse("1 millilitro acqua", "ita").unit).to.equal("millilitro");
-		});
-		it('"1 pizzico acqua"', () => {
-			expect(parse("2 pizzichi sale", "ita").unit).to.equal("pizzico");
-		});
-		it('"1 cubetto di ghiaccio"', () => {
-			expect(parse("2 cubetto di ghiaccio", "ita").unit).to.equal("cubetto");
-		});
-	});
+  it('translates unit when no unit provided', () => {
+    expect(parse('1 tortilla', 'ita')).to.deep.equal({
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: 'tortilla',
+      quantity: 1,
+      minQty: 1,
+      maxQty: 1,
+    });
+  });
+  it('test order and case sensitive', () => {
+    expect(parse('100 ml. tortilla ', 'ita')).to.deep.equal({
+      unit: 'millilitro',
+      unitPlural: 'millilitri',
+      symbol: 'ml',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse('100 mg. tortilla ', 'ita')).to.deep.equal({
+      unit: 'milligrammo',
+      unitPlural: 'milligrammi',
+      symbol: 'mg',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse('100 g. tortilla ', 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse("1 g. d' acqua", 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'acqua',
+      quantity: 1,
+      minQty: 1,
+      maxQty: 1,
+    });
+    expect(parse('100 g. di tortilla ', 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse('q.b. di sale', 'ita')).to.deep.equal({
+      unit: 'q.b.',
+      unitPlural: 'q.b.',
+      symbol: null,
+      ingredient: 'sale',
+      quantity: 0,
+      minQty: 0,
+      maxQty: 0,
+    });
+    expect(parse('100 gr. tortilla ', 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse('tortilla 100 gr.', 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'tortilla',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+    expect(parse('basilico quanto basta', 'ita')).to.deep.equal({
+      unit: 'q.b.',
+      unitPlural: 'q.b.',
+      symbol: null,
+      ingredient: 'basilico',
+      quantity: 0,
+      minQty: 0,
+      maxQty: 0,
+    });
+    expect(parse('basilico q.b.', 'ita')).to.deep.equal({
+      unit: 'q.b.',
+      unitPlural: 'q.b.',
+      symbol: null,
+      ingredient: 'basilico',
+      quantity: 0,
+      minQty: 0,
+      maxQty: 0,
+    });
+    expect(parse('basilico QB', 'ita')).to.deep.equal({
+      unit: 'q.b.',
+      unitPlural: 'q.b.',
+      symbol: null,
+      ingredient: 'basilico',
+      quantity: 0,
+      minQty: 0,
+      maxQty: 0,
+    });
+    expect(parse('basilico millilitri 100', 'ita')).to.deep.equal({
+      unit: 'millilitro',
+      unitPlural: 'millilitri',
+      symbol: 'ml',
+      ingredient: 'basilico',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+  });
+  it("doesn't explode when no unit and no quantity provided", () => {
+    expect(parse('zucchero a velo', 'ita')).to.deep.equal({
+      unit: 'q.b.',
+      unitPlural: 'q.b.',
+      symbol: null,
+      ingredient: 'zucchero a velo',
+      quantity: 0,
+      minQty: 0,
+      maxQty: 0,
+    });
+  });
+  it('test noci', () => {
+    expect(parse('quattro noci', 'ita')).to.deep.equal({
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: 'noci',
+      quantity: 4,
+      minQty: 4,
+      maxQty: 4,
+    });
+    expect(parse('una noce', 'ita')).to.deep.equal({
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: 'noce',
+      quantity: 1,
+      minQty: 1,
+      maxQty: 1,
+    });
+    expect(parse('100 gr di noci', 'ita')).to.deep.equal({
+      unit: 'grammo',
+      unitPlural: 'grammi',
+      symbol: 'g',
+      ingredient: 'noci',
+      quantity: 100,
+      minQty: 100,
+      maxQty: 100,
+    });
+  });
+  describe('translates the abbreviated units of', () => {
+    it('"1 tazza acqua"', () => {
+      expect(parse('1 tazza acqua', 'ita').unit).to.equal('tazza');
+      expect(parse('2 tazzine acqua', 'ita').unit).to.equal('tazza');
+      expect(parse('2 tazze acqua', 'ita').unit).to.equal('tazza');
+    });
+    it('"1 litro acqua"', () => {
+      expect(parse('1 l acqua', 'ita').unit).to.equal('litro');
+      expect(parse('1 litri acqua', 'ita').unit).to.equal('litro');
+    });
+    it('"1 grammo acqua"', () => {
+      expect(parse('1 gr acqua', 'ita').unit).to.equal('grammo');
+      expect(parse('2 g acqua', 'ita').unit).to.equal('grammo');
+      expect(parse('2 g. acqua', 'ita').ingredient).to.equal('acqua');
+    });
+    it('"1 chilogrammo acqua"', () => {
+      expect(parse('1 kg acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('2 KG acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('1 kilogrammo acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('2 Kilogrammo acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('acqua KILOGRAMMO 2', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('acqua KILOGRAMMO due', 'ita').unit).to.equal('chilogrammo');
+    });
+    it('"1 tazza acqua"', () => {
+      expect(parse('1 tazza acqua', 'ita').unit).to.equal('tazza');
+      expect(parse('1 tazzina acqua', 'ita').unit).to.equal('tazza');
+      expect(parse('2 tazzine acqua', 'ita').unit).to.equal('tazza');
+      expect(parse('2 Tazza acqua', 'ita').unit).to.equal('tazza');
+    });
+    it('"1 millilitro acqua"', () => {
+      expect(parse('1 ml acqua', 'ita').unit).to.equal('millilitro');
+      expect(parse('1 ml. acqua', 'ita').unit).to.equal('millilitro');
+      expect(parse('1 millilitro acqua', 'ita').unit).to.equal('millilitro');
+      expect(parse('1 Millilitro acqua', 'ita').unit).to.equal('millilitro');
+    });
+    it('"1 cucchiaio acqua"', () => {
+      expect(parse('2 cucchiai acqua', 'ita').unit).to.equal('cucchiaio');
+      expect(parse('1 Cucchiaio acqua', 'ita').unit).to.equal('cucchiaio');
+      expect(parse('2 cucchiai acqua', 'ita').unit).to.equal('cucchiaio');
+    });
+    it('"1 cucchiaino acqua"', () => {
+      expect(parse('1 Cucchiaino acqua', 'ita').unit).to.equal('cucchiaino');
+      expect(parse('1 cucchiaino acqua', 'ita').unit).to.equal('cucchiaino');
+      expect(parse('2 Cucchiaini acqua', 'ita').unit).to.equal('cucchiaino');
+      expect(parse('2 cucchiaini acqua', 'ita').unit).to.equal('cucchiaino');
+    });
+    it('"1 grammo acqua"', () => {
+      expect(parse('1 g acqua', 'ita').unit).to.equal('grammo');
+      expect(parse('1 g. acqua', 'ita').unit).to.equal('grammo');
+      expect(parse('2 grammi acqua', 'ita').unit).to.equal('grammo');
+    });
+    it('"1 chilogrammo acqua"', () => {
+      expect(parse('1 kg acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('1 kg. acqua', 'ita').unit).to.equal('chilogrammo');
+      expect(parse('2 chilogrammi acqua', 'ita').unit).to.equal('chilogrammo');
+    });
+    it('"1 litro acqua"', () => {
+      expect(parse('1 l acqua', 'ita').unit).to.equal('litro');
+      expect(parse('1 l. acqua', 'ita').unit).to.equal('litro');
+      expect(parse('2 litri acqua', 'ita').unit).to.equal('litro');
+    });
+    it('"1 milligrammo acqua"', () => {
+      expect(parse('1 mg acqua', 'ita').unit).to.equal('milligrammo');
+      expect(parse('1 mg. acqua', 'ita').unit).to.equal('milligrammo');
+      expect(parse('1 milligrammo acqua', 'ita').unit).to.equal('milligrammo');
+    });
+    it('"1 millilitro acqua"', () => {
+      expect(parse('1 ml acqua', 'ita').unit).to.equal('millilitro');
+      expect(parse('1 ml. acqua', 'ita').unit).to.equal('millilitro');
+      expect(parse('1 millilitro acqua', 'ita').unit).to.equal('millilitro');
+    });
+    it('"1 pizzico acqua"', () => {
+      expect(parse('2 pizzichi sale', 'ita').unit).to.equal('pizzico');
+    });
+    it('"1 cubetto di ghiaccio"', () => {
+      expect(parse('2 cubetto di ghiaccio', 'ita').unit).to.equal('cubetto');
+    });
+  });
 
 	describe("translates the ingredient of", () => {
 		it('"1 cucchiaio d\'acqua"', () => {
