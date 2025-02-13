@@ -1,6 +1,6 @@
-import * as convert from './convert';
-import {SupportedLanguages, i18nMap} from './i18n';
-import {repeatingFractions} from './repeatingFractions';
+import * as convert from './convert.js';
+import {SupportedLanguages, i18nMap} from './i18n/index.js';
+import {repeatingFractions} from './repeatingFractions.js';
 
 export interface Ingredient {
   ingredient: string;

@@ -1,4 +1,4 @@
-import {i18nMap, SupportedLanguages} from './i18n';
+import {i18nMap, SupportedLanguages} from './i18n/index.js';
 
 function keepThreeDecimals(val: number, delimiter: string) {
   const strVal = val.toString();

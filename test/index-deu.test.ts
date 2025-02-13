@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {parse} from '../src/index';
+import {parse} from '../src/index.js';
 
 describe('recipe parser deu', () => {
   it('returns an object', () => {

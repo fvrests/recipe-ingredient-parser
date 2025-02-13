@@ -1,6 +1,6 @@
-import {LangDeu} from './lang.deu';
-import {LangEng} from './lang.eng';
-import {LangIta} from './lang.ita';
+import {LangDeu} from './lang.deu.js';
+import {LangEng} from './lang.eng.js';
+import {LangIta} from './lang.ita.js';
 
 export type SupportedLanguages = 'eng' | 'ita' | 'deu';
 

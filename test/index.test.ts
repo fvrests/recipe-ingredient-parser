@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {combine, Ingredient, prettyPrintingPress} from '../src/index';
+import {combine, Ingredient, prettyPrintingPress} from '../src/index.js';
 
 describe('combine ingredients', () => {
   it('accepts an empty array', () => {

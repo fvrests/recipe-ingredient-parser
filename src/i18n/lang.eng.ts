@@ -1,4 +1,4 @@
-import {LanguageConfig} from './interfaces';
+import {LanguageConfig} from './interfaces.js';
 
 const units = {
   clove: ['clove'],
