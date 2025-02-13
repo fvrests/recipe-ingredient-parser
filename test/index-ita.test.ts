@@ -51,26 +51,26 @@ describe("recipe parser ita", () => {
 		it('of "Q.B di acqua"', () => {
 			expect(parse("Q.b di acqua", "ita").unit).to.equal("q.b.");
 		});
-		it('of "1 cucchiao acqua"', () => {
-			expect(parse("1 cucchiao acqua", "ita").quantity).to.equal(1);
+		it('of "1 cucchiaio acqua"', () => {
+			expect(parse("1 cucchiaio acqua", "ita").quantity).to.equal(1);
 		});
-		it('of "1,5 cucchiao acqua"', () => {
-			expect(parse("1,5 cucchiao acqua", "ita").quantity).to.equal(1.5);
+		it('of "1,5 cucchiaio acqua"', () => {
+			expect(parse("1,5 cucchiaio acqua", "ita").quantity).to.equal(1.5);
 		});
-		it('of "1 1/2 cucchiao acqua"', () => {
-			expect(parse("1 1/2 cucchiao acqua", "ita").quantity).to.equal(1.5);
+		it('of "1 1/2 cucchiaio acqua"', () => {
+			expect(parse("1 1/2 cucchiaio acqua", "ita").quantity).to.equal(1.5);
 		});
-		it('of "1/3 cucchiao acqua"', () => {
-			expect(parse("1/3 cucchiao acqua", "ita").quantity).to.equal(0.333);
+		it('of "1/3 cucchiaio acqua"', () => {
+			expect(parse("1/3 cucchiaio acqua", "ita").quantity).to.equal(0.333);
 		});
-		it('of "1/2 cucchiao acqua"', () => {
-			expect(parse("1/2 cucchiao acqua", "ita").quantity).to.equal(0.5);
+		it('of "1/2 cucchiaio acqua"', () => {
+			expect(parse("1/2 cucchiaio acqua", "ita").quantity).to.equal(0.5);
 		});
-		it('of "10 1/2 cucchiao acqua"', () => {
-			expect(parse("10 1/2 cucchiao acqua", "ita").quantity).to.equal(10.5);
+		it('of "10 1/2 cucchiaio acqua"', () => {
+			expect(parse("10 1/2 cucchiaio acqua", "ita").quantity).to.equal(10.5);
 		});
-		it('of "about 1/2 cucchiao acqua"', () => {
-			expect(parse("about 1/2 cucchiao acqua", "ita").quantity).to.equal(0.5);
+		it('of "about 1/2 cucchiaio acqua"', () => {
+			expect(parse("about 1/2 cucchiaio acqua", "ita").quantity).to.equal(0.5);
 		});
 
 		describe("translates the quantity from string to number", () => {
@@ -116,14 +116,14 @@ describe("recipe parser ita", () => {
 		});
 
 		//  describe('translates the quantity range', () => {
-		//    it('of "10-20 cucchiao acqua"', () => {
-		//      expect(parse('10-20 cucchiao acqua', 'ita').quantity).to.equal('10-20');
+		//    it('of "10-20 cucchiaio acqua"', () => {
+		//      expect(parse('10-20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
 		//    });
-		//    it('of "10 - 20 cucchiao acqua"', () => {
-		//      expect(parse('10 - 20 cucchiao acqua', 'ita').quantity).to.equal('10-20');
+		//    it('of "10 - 20 cucchiaio acqua"', () => {
+		//      expect(parse('10 - 20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
 		//    });
-		//    it('of "10 to 20 cucchiao acqua"', () => {
-		//      expect(parse('10 to 20 cucchiao acqua', 'ita').quantity).to.equal('10-20');
+		//    it('of "10 to 20 cucchiaio acqua"', () => {
+		//      expect(parse('10 to 20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
 		//    });
 		//  });
 
@@ -157,7 +157,7 @@ describe("recipe parser ita", () => {
 				const element = unicodeAmounts[u];
 				const expectedAmount = unicodeExpectedAmounts[u];
 				it(`${element} to ${expectedAmount}`, () => {
-					expect(parse(`${element} cucchiao acqua`, "ita").quantity).to.equal(
+					expect(parse(`${element} cucchiaio acqua`, "ita").quantity).to.equal(
 						expectedAmount
 					);
 				});
@@ -192,7 +192,7 @@ describe("recipe parser ita", () => {
 				const expectedAmount =
 					Number(mixedExpectedValues[u]) + Number(unicodeExpectedAmounts[u]);
 				it(`${element} to ${expectedAmount}`, () => {
-					expect(parse(`${element} cucchiao acqua`, "ita").quantity).to.equal(
+					expect(parse(`${element} cucchiaio acqua`, "ita").quantity).to.equal(
 						expectedAmount
 					);
 				});
