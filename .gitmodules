@@ -1,3 +1,0 @@
-[submodule "path_to_submodule"] 
-  path = 'https://github.com/suprmat95/recipe-parser.git'
-  url = git@github.com:suprmat95/recipe-parser.git'
