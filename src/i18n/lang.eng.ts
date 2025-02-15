@@ -1,6 +1,6 @@
 import { LanguageConfig } from "./interfaces.js";
 
-const baseUnits = ""
+const baseUnits = "";
 
 const units = {
 	clove: ["clove"],
@@ -134,14 +134,14 @@ const numbersMagnitude: { [key: string]: number } = {
 };
 
 export const LangEng: LanguageConfig = {
-  baseUnits,
-  units,
-  pluralUnits,
-  symbolUnits,
-  prepositions,
-  joiners,
-  toTaste,
-  numbersSmall,
-  numbersMagnitude,
-  isCommaDelimited: false,
+	baseUnits,
+	units,
+	pluralUnits,
+	symbolUnits,
+	prepositions,
+	joiners,
+	toTaste,
+	numbersSmall,
+	numbersMagnitude,
+	isCommaDelimited: false,
 };

@@ -47,9 +47,13 @@ export function toTasteRecognize(
 }
 
 // return format = [unit, unitPlural, symbol, originalUnit]
-function getUnit(quantity: string, input: string, language: SupportedLanguages): string[] {
-  const {units, pluralUnits, symbolUnits, baseUnits} = i18nMap[language];
-  const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
+function getUnit(
+	quantity: string,
+	input: string,
+	language: SupportedLanguages
+): string[] {
+	const { units, pluralUnits, symbolUnits, baseUnits } = i18nMap[language];
+	const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
 	const res = (response: string[]) => {
 		const symbol = symbolUnits[response[0]];
@@ -57,15 +61,15 @@ function getUnit(quantity: string, input: string, language: SupportedLanguages):
 		return response;
 	};
 
-  // identify discretionary units
-  if (toTaste) {
-    return res([toTaste, toTaste, toTasteMatch]);
-  }
+	// identify discretionary units
+	if (toTaste) {
+		return res([toTaste, toTaste, toTasteMatch]);
+	}
 
-  // input is a perfect match to a unit
-  if (units[input] || pluralUnits[input]) {
-    return res([input, pluralUnits[input], input]);
-  }
+	// input is a perfect match to a unit
+	if (units[input] || pluralUnits[input]) {
+		return res([input, pluralUnits[input], input]);
+	}
 
 	for (const unit of Object.keys(units)) {
 		for (const shorthand of units[unit]) {
@@ -89,12 +93,12 @@ function getUnit(quantity: string, input: string, language: SupportedLanguages):
 		}
 	}
 
-  // if no quantity or unit is detected and the language specifies a baseUnit
-  if ((!quantity || quantity == '0') && baseUnits.length > 0 && input){
-     return res(['q.b.', 'q.b.', '']);
- }
+	// if no quantity or unit is detected and the language specifies a baseUnit
+	if ((!quantity || quantity == "0") && baseUnits.length > 0 && input) {
+		return res(["q.b.", "q.b.", ""]);
+	}
 
-  return [];
+	return [];
 }
 
 /* return the proposition if it's used before of the name of
@@ -132,17 +136,17 @@ export function parse(recipeString: string, language: SupportedLanguages) {
 
 	/* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
   For example: "sugar (or other sweetener)" --> extraInfo: "(or other sweetener)" */
-  let extraInfo;
-  if (convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/)) {
-    extraInfo = convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/);
-    restOfIngredient = restOfIngredient.replace(extraInfo, '').trim();
-  }
-  // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
-  const [unit, unitPlural, symbol, originalUnit] = getUnit(
-    quantity,
-    restOfIngredient,
-    language,
-  ) as string[];
+	let extraInfo;
+	if (convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/)) {
+		extraInfo = convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/);
+		restOfIngredient = restOfIngredient.replace(extraInfo, "").trim();
+	}
+	// grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
+	const [unit, unitPlural, symbol, originalUnit] = getUnit(
+		quantity,
+		restOfIngredient,
+		language
+	) as string[];
 
 	// remove unit from the ingredient if one was found and trim leading and trailing whitespace
 	let ingredient = originalUnit
