@@ -1,6 +1,6 @@
 import { LanguageConfig } from "./interfaces.js";
 
-const baseUnits = "q.b.";
+const baseUnit = "q.b.";
 
 const units = {
 	barattolo: ["barattolo", "barattoli"],
@@ -185,7 +185,7 @@ export const numbersMagnitude: { [key: string]: number } = {
 };
 
 export const LangIta: LanguageConfig = {
-	baseUnits,
+	baseUnit,
 	units,
 	pluralUnits,
 	symbolUnits,

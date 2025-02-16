@@ -52,7 +52,7 @@ function getUnit(
 	input: string,
 	language: SupportedLanguages
 ): string[] {
-	const { units, pluralUnits, symbolUnits, baseUnits } = i18nMap[language];
+	const { units, pluralUnits, symbolUnits, baseUnit } = i18nMap[language];
 	const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
 	const res = (response: string[]) => {
@@ -94,8 +94,8 @@ function getUnit(
 	}
 
 	// if no quantity or unit is detected and the language specifies a baseUnit
-	if ((!quantity || quantity == "0") && baseUnits.length > 0 && input) {
-		return res(["q.b.", "q.b.", ""]);
+	if ((!quantity || quantity == "0") && baseUnit.length > 0 && input) {
+		return res([baseUnit, baseUnit, ""]);
 	}
 
 	return [];

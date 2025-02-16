@@ -1,6 +1,6 @@
 import { LanguageConfig } from "./interfaces.js";
 
-const baseUnits = "";
+const baseUnit = "";
 
 const units = {
 	Pack: ["pack", "packung", "pck", "pck.", "päckchen"],
@@ -134,7 +134,7 @@ const numbersMagnitude: { [key: string]: number } = {
 };
 
 export const LangDeu: LanguageConfig = {
-	baseUnits,
+	baseUnit,
 	units,
 	pluralUnits,
 	symbolUnits,
