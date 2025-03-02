@@ -1,6 +1,6 @@
 import { i18nMap, SupportedLanguages } from "./i18n/index.js";
 
-function keepThreeDecimals(val: number, delimiter: string) {
+function keepThreeDecimals(val: number, delimiter: string): string {
 	const strVal = val.toString();
 	return (
 		strVal.split(".")[0] + delimiter + strVal.split(".")[1].substring(0, 3)
@@ -32,7 +32,7 @@ export function convertFromFraction(
 	}
 }
 
-export function getFirstMatch(line: string, regex: RegExp) {
+export function getFirstMatch(line: string, regex: RegExp): string {
 	const match = line.match(regex);
 	return (match && match[0]) || "";
 }
@@ -57,52 +57,111 @@ const unicodeObj: { [key: string]: string } = {
 	"⅑": "1/9",
 	"⅒": "1/10",
 };
-export function text2num(s: string, language: SupportedLanguages) {
-	const a = s.toString().split(/[\s-]+/);
-	let values: number[] = [0, 0];
-	a.forEach((x) => {
-		values = feach(x, values[0], values[1], language);
-	});
-	if (values[0] + values[1] < 0) {
-		return null;
-	} else {
-		return values[0] + values[1];
-	}
-}
 
-export function feach(
-	w: string,
-	g: number,
-	n: number,
+// fix: deal with numbers that are combined in non-english languages - e.g.
+// German einhundert / zweihunderttausend(https://mylanguagebreak.com/basics-of-german-numbering/) &
+// Italian duecento / seimila
+// right now, is tested / handled but must be "due-cento" / "sei-mila"
+// (https://www.italyheritage.com/learn-italian/course/grammar/numbers.htm)
+export function parseWrittenNumber(
+	input: string,
 	language: SupportedLanguages
-): number[] {
+): [quantity: string | null, restOfIngredient: string] {
+	// split string by 1 or more whitespace characters or dashes
+	const sections = input.split(/[\s-]+/);
+	console.log({ sections });
+	let [smallValue, result]: number[] = [0, 0];
+	let restOfIngredient: string = input;
 	const { numbersSmall, numbersMagnitude } = i18nMap[language];
 
-	let x = numbersSmall[w];
-	if (x != null) {
-		g = g + x;
-	} else if (100 == numbersMagnitude[w]) {
-		if (g > 0) {
-			g = g * 100;
+	let previousMatch: number | null = null;
+	const processMatch = (
+		match: number,
+		type: "small" | "magnitude",
+		trimFromIngredient: string
+	) => {
+		if (type === "small") {
+			smallValue += match;
 		} else {
-			g = 100;
+			// previous match was a magnitude value
+			if (previousMatch && previousMatch >= 100) {
+				result = result * match;
+			} else {
+				// previous match was a small value
+				result += (smallValue ? smallValue : 1) * match;
+			}
+			smallValue = 0;
 		}
+		if (trimFromIngredient) {
+			let partialRegex = new RegExp(`^${trimFromIngredient}\\s*`, "g");
+			restOfIngredient = restOfIngredient.replace(partialRegex, "");
+			console.log({ restOfIngredient });
+			// todo: process rest of section if partial match found
+			// if (restOfIngredient.length > 0) {
+			// 	processSection(restOfIngredient);
+			// }
+			previousMatch = match;
+			return true;
+		}
+	};
+	const parseSection = (section: string) => {
+		let match: number = numbersSmall[section];
+		// entire string matches small value
+		if (!!match) {
+			console.log("small match", match);
+			processMatch(match, "small", section);
+			return true;
+		}
+		// entire string matches magnitude value
+		match = numbersMagnitude[section];
+		if (!!match) {
+			console.log("magnitude match", match);
+			processMatch(match, "magnitude", section);
+			return true;
+		}
+		// starts with small value
+		let partialMatch: [string, number] | null =
+			Object.entries(numbersSmall).find(([key, _]) => {
+				return section.startsWith(key);
+			}) ?? null;
+		if (!!partialMatch) {
+			processMatch(partialMatch[1], "small", partialMatch[0]);
+			console.log("small match found", { partialMatch });
+			return true;
+		}
+		// starts with magnitude value
+		partialMatch =
+			Object.entries(numbersMagnitude).find(([key, _]) => {
+				return section.startsWith(key);
+			}) ?? null;
+		if (!!partialMatch) {
+			processMatch(partialMatch[1], "magnitude", partialMatch[0]);
+			console.log("magnitude match found", { partialMatch });
+			return true;
+		}
+		// no matches - return false
+		return false;
+	};
+
+	sections.every((section) => {
+		// if no matches found in section, loop will break
+		return parseSection(section);
+	});
+	// no matches found -- return full string
+	if (result + smallValue < 0) {
+		return [null, input];
 	} else {
-		x = numbersMagnitude[w];
-		if (x != null) {
-			n = n + g * x;
-			g = 0;
-		} else {
-			return [-1, -1];
-		}
+		// add any remaining small value to result
+		let quantity = result + smallValue;
+		console.log({ quantity });
+		return [quantity.toString(), restOfIngredient];
 	}
-	return [g, n];
 }
 
 export function findQuantityAndConvertIfUnicode(
 	ingredientLine: string,
 	language: SupportedLanguages
-) {
+): [string | null, string] {
 	const { joiners, isCommaDelimited } = i18nMap[language];
 
 	// Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"
@@ -126,7 +185,6 @@ export function findQuantityAndConvertIfUnicode(
 		`(\\d*)\\s*(${Object.keys(unicodeObj).join("|")})`,
 		""
 	);
-	const wordUntilSpace = /[^\s]+/g;
 
 	// found a unicode quantity inside our regex, for ex: '⅝'
 	const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
@@ -166,21 +224,13 @@ export function findQuantityAndConvertIfUnicode(
 	}
 
 	// found a word which we can test for numeric value
-	const wordUntilSpaceMatch = ingredientLine.match(wordUntilSpace);
-	if (wordUntilSpaceMatch) {
-		const quantity = getFirstMatch(ingredientLine, wordUntilSpace);
-		const quantityNumber = text2num(quantity.toLowerCase(), language);
-		if (quantityNumber) {
-			const restOfIngredient = ingredientLine
-				.replace(getFirstMatch(ingredientLine, wordUntilSpace), "")
-				.trim();
-			const quantityString = isCommaDelimited
-				? `${quantityNumber}`.replace(".", ",")
-				: `${quantityNumber}`;
-			return [quantityString, restOfIngredient];
-		}
-		return [null, ingredientLine];
-	}
+	console.log({ ingredientLine });
+	const [quantity, restOfIngredient]: [
+		quantity: string | null,
+		restOfIngredient: string
+	] = parseWrittenNumber(ingredientLine, language);
+	if (quantity) return [quantity, restOfIngredient];
 
+	// no matches -- return untransformed ingredient
 	return [null, ingredientLine];
 }

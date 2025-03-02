@@ -67,6 +67,11 @@ describe("recipe parser eng", () => {
 			it('five teaspoon water"', () => {
 				expect(parse("five teaspoon water", "eng").quantity).to.equal(5);
 			});
+			it('one hundred twenty five teaspoons water"', () => {
+				expect(
+					parse("one hundred twenty five teaspoons water", "eng").quantity
+				).to.equal(125);
+			});
 		});
 
 		describe("to taste detector", () => {
