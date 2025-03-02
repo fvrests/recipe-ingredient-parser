@@ -126,6 +126,8 @@ const prepositions = ["di", "d'"];
 
 const joiners = ["o"];
 
+const additiveJoiners = ["e"];
+
 const toTaste = ["quanto basta"];
 
 export const numbersSmall: { [key: string]: number } = {
@@ -156,22 +158,39 @@ export const numbersSmall: { [key: string]: number } = {
 	diciassette: 17,
 	diciotto: 18,
 	diciannove: 19,
+	vent: 20,
 	venti: 20,
 	ventuno: 21,
+	ventitré: 23,
+	ventotto: 28,
 	trenta: 30,
 	trentuno: 31,
+	trentatré: 23,
+	trentotto: 38,
 	quaranta: 40,
 	quarantuno: 41,
+	quarantatré: 23,
+	quarantotto: 48,
 	cinquanta: 50,
 	cinquantuno: 51,
+	cinquantatré: 23,
+	cinquantotto: 58,
 	sessasanta: 60,
 	sessasantuno: 61,
+	sessantatré: 23,
+	sessantotto: 68,
 	settanta: 70,
 	settantuno: 71,
+	settantatré: 23,
+	settantotto: 78,
 	ottanta: 80,
 	ottantuno: 81,
+	ottantatré: 23,
+	ottantotto: 88,
 	novanta: 90,
 	novantuno: 91,
+	novantatré: 23,
+	novantotto: 98,
 };
 
 export const numbersMagnitude: { [key: string]: number } = {
@@ -191,6 +210,7 @@ export const LangIta: LanguageConfig = {
 	symbolUnits,
 	prepositions,
 	joiners,
+	additiveJoiners,
 	toTaste,
 	numbersSmall,
 	numbersMagnitude,

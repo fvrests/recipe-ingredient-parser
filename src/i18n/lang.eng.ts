@@ -92,11 +92,25 @@ const prepositions = ["of"];
 
 const joiners = ["to"];
 
+const additiveJoiners = ["and"];
+
 const toTaste = ["to taste"];
+
+// const numbersFraction: { [key: string]: number } = {
+// 	quarter: 0.25,
+// 	quarters: 0.25,
+// 	fourth: 0.25,
+// 	fourths: 0.25,
+// 	third: 0.33,
+// 	thirds: 0.33,
+// 	half: 0.5,
+// };
 
 const numbersSmall: { [key: string]: number } = {
 	zero: 0,
 	one: 1,
+	a: 1,
+	an: 1,
 	two: 2,
 	three: 3,
 	four: 4,
@@ -140,6 +154,7 @@ export const LangEng: LanguageConfig = {
 	symbolUnits,
 	prepositions,
 	joiners,
+	additiveJoiners,
 	toTaste,
 	numbersSmall,
 	numbersMagnitude,

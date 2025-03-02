@@ -1,6 +1,6 @@
 import { i18nMap, SupportedLanguages } from "./i18n/index.js";
 
-function keepThreeDecimals(val: number, delimiter: string) {
+function keepThreeDecimals(val: number, delimiter: string): string {
 	const strVal = val.toString();
 	return (
 		strVal.split(".")[0] + delimiter + strVal.split(".")[1].substring(0, 3)
@@ -32,7 +32,7 @@ export function convertFromFraction(
 	}
 }
 
-export function getFirstMatch(line: string, regex: RegExp) {
+export function getFirstMatch(line: string, regex: RegExp): string {
 	const match = line.match(regex);
 	return (match && match[0]) || "";
 }
@@ -57,52 +57,135 @@ const unicodeObj: { [key: string]: string } = {
 	"⅑": "1/9",
 	"⅒": "1/10",
 };
-export function text2num(s: string, language: SupportedLanguages) {
-	const a = s.toString().split(/[\s-]+/);
-	let values: number[] = [0, 0];
-	a.forEach((x) => {
-		values = feach(x, values[0], values[1], language);
-	});
-	if (values[0] + values[1] < 0) {
-		return null;
-	} else {
-		return values[0] + values[1];
-	}
-}
 
-export function feach(
-	w: string,
-	g: number,
-	n: number,
+// fix: needs some kind of sorting? "trentatre" fails (produces 13) as "tre" is found before "trentatre"
+// fix: should not capture "a" if partial word match e.g. "one and a half" -> "2 nd a half"
+export function parseWrittenNumber(
+	input: string,
 	language: SupportedLanguages
-): number[] {
-	const { numbersSmall, numbersMagnitude } = i18nMap[language];
+): [quantity: string | null, restOfIngredient: string] {
+	// split string by 1 or more whitespace characters or dashes
+	const sections = input.split(/[\s-]+/);
 
-	let x = numbersSmall[w];
-	if (x != null) {
-		g = g + x;
-	} else if (100 == numbersMagnitude[w]) {
-		if (g > 0) {
-			g = g * 100;
-		} else {
-			g = 100;
+	let [smallValue, result]: number[] = [0, 0];
+	let restOfIngredient: string = input;
+	const { numbersSmall, numbersMagnitude, additiveJoiners } = i18nMap[language];
+	let previousMatch: number | null = null;
+
+	const parseSection = (section: string) => {
+		// ignore additive joiners and continue to parse next section
+		if (additiveJoiners.includes(section)) {
+			return true;
 		}
+
+		const applyMatch = (
+			match: number,
+			type: "small" | "magnitude",
+			trimFromIngredient: string
+		) => {
+			if (type === "small") {
+				// addition accounts for juxtaposed small values, e.g. "twenty one"
+				smallValue += match;
+			} else {
+				// process magnitude value
+				if (previousMatch && previousMatch >= 100) {
+					// previous match was a magnitude value, e.g. "hundred thousand"
+					result = result * match;
+				} else {
+					// previous match was a small value, e.g. "one thousand"
+					result += (smallValue ? smallValue : 1) * match;
+				}
+				// after magnitude value, small value no longer has been expended (e.g. "five thousand" -- five has been applied and should be reset)
+				smallValue = 0;
+			}
+			if (trimFromIngredient) {
+				let partialRegex = new RegExp(`^${trimFromIngredient}\\s*`, "g");
+				restOfIngredient = restOfIngredient.replace(partialRegex, "");
+				previousMatch = match;
+				return true;
+			}
+		};
+
+		// entire string matches small value
+		let match: number = numbersSmall[section];
+		if (!!match) {
+			applyMatch(match, "small", section);
+			return true;
+		}
+		// entire string matches magnitude value
+		match = numbersMagnitude[section];
+		if (!!match) {
+			applyMatch(match, "magnitude", section);
+			return true;
+		}
+
+		const getPartialMatches = (
+			section: string
+		): { match: [string, number]; type: "small" | "magnitude" }[] | null => {
+			let partialMatches: { match: [string, number]; type: string }[] = [];
+			let match: [string, number] | null = null;
+			let findMatch = (workingSection: string): any => {
+				match =
+					Object.entries(numbersSmall).find(([key, _]) => {
+						return workingSection.startsWith(key);
+					}) ?? null;
+				if (match) {
+					partialMatches.push({ match, type: "small" });
+					workingSection = workingSection.replace(match[0], "");
+				} else {
+					match =
+						Object.entries(numbersMagnitude).find(([key, _]) => {
+							return workingSection.startsWith(key);
+						}) ?? null;
+					if (match) {
+						partialMatches.push({ match, type: "magnitude" });
+						workingSection = workingSection.replace(match[0], "");
+					}
+				}
+				if (workingSection.length === 0) {
+					// entire string parsed and all sections matched
+					return partialMatches;
+				} else if (match) {
+					// match found, keep parsing
+					return findMatch(workingSection);
+				} else {
+					// non-matching section found, reject result
+					return null;
+				}
+			};
+			return findMatch(section);
+		};
+
+		// perf: check for simple matches before partials
+		let partialMatches = getPartialMatches(section);
+		if (partialMatches) {
+			partialMatches.forEach(({ match, type }) =>
+				applyMatch(match[1], type, match[0])
+			);
+		}
+		// no matches - return false
+		return false;
+	};
+
+	sections.every((section) => {
+		// if no matches found in section, loop will break
+		return parseSection(section);
+	});
+
+	// no matches found -- return full string
+	if (result + smallValue < 0) {
+		return [null, input];
 	} else {
-		x = numbersMagnitude[w];
-		if (x != null) {
-			n = n + g * x;
-			g = 0;
-		} else {
-			return [-1, -1];
-		}
+		// add any remaining small value to result
+		let quantity = result + smallValue;
+		return [quantity.toString(), restOfIngredient];
 	}
-	return [g, n];
 }
 
 export function findQuantityAndConvertIfUnicode(
 	ingredientLine: string,
 	language: SupportedLanguages
-) {
+): [string | null, string] {
 	const { joiners, isCommaDelimited } = i18nMap[language];
 
 	// Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"
@@ -126,7 +209,6 @@ export function findQuantityAndConvertIfUnicode(
 		`(\\d*)\\s*(${Object.keys(unicodeObj).join("|")})`,
 		""
 	);
-	const wordUntilSpace = /[^\s]+/g;
 
 	// found a unicode quantity inside our regex, for ex: '⅝'
 	const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
@@ -165,22 +247,13 @@ export function findQuantityAndConvertIfUnicode(
 		return [quantity, restOfIngredient];
 	}
 
-	// found a word which we can test for numeric value
-	const wordUntilSpaceMatch = ingredientLine.match(wordUntilSpace);
-	if (wordUntilSpaceMatch) {
-		const quantity = getFirstMatch(ingredientLine, wordUntilSpace);
-		const quantityNumber = text2num(quantity.toLowerCase(), language);
-		if (quantityNumber) {
-			const restOfIngredient = ingredientLine
-				.replace(getFirstMatch(ingredientLine, wordUntilSpace), "")
-				.trim();
-			const quantityString = isCommaDelimited
-				? `${quantityNumber}`.replace(".", ",")
-				: `${quantityNumber}`;
-			return [quantityString, restOfIngredient];
-		}
-		return [null, ingredientLine];
-	}
+	// test for words with numeric value at beginning of string
+	const [quantity, restOfIngredient]: [
+		quantity: string | null,
+		restOfIngredient: string
+	] = parseWrittenNumber(ingredientLine, language);
 
+	if (quantity) return [quantity, restOfIngredient];
+	// no matches -- return untransformed ingredient
 	return [null, ingredientLine];
 }

@@ -54,18 +54,69 @@ describe("recipe parser eng", () => {
 			expect(parse("1,500.50 teaspoon water", "eng").quantity).to.equal(1500.5);
 		});
 
-		describe("translates the quantity from string to number", () => {
-			it('zero teaspoon water"', () => {
-				expect(parse("zero teaspoon water", "eng").quantity).to.equal(0);
-			});
-			it('one teaspoon water"', () => {
+		// todo: remove only after develop
+		describe.only("converts a written quantity to number", () => {
+			it("should convert small numbers", () => {
+				expect(parse("zero teaspoons water", "eng").quantity).to.equal(0);
 				expect(parse("one teaspoon water", "eng").quantity).to.equal(1);
+				expect(parse("twenty eight teaspoons water", "eng").quantity).to.equal(
+					28
+				);
 			});
-			it('twenty-one teaspoon water"', () => {
-				expect(parse("twenty-one teaspoon water", "eng").quantity).to.equal(21);
+			it('should convert dash-separated numbers"', () => {
+				expect(parse("forty-six teaspoons water", "eng").quantity).to.equal(46);
 			});
-			it('five teaspoon water"', () => {
-				expect(parse("five teaspoon water", "eng").quantity).to.equal(5);
+			it('should convert magnitude numbers"', () => {
+				expect(parse("one hundred teaspoons water", "eng").quantity).to.equal(
+					100
+				);
+			});
+			it('should convert mixed small & magnitude numbers"', () => {
+				expect(
+					parse("four thousand one hundred twenty five teaspoons water", "eng")
+						.quantity
+				).to.equal(4125);
+			});
+			it("should not fail when some keys fully contain others", () => {
+				expect(parse("fourteen teaspoons water", "eng").quantity).to.equal(14);
+			});
+			it("should handle cases with `and`", () => {
+				expect(
+					parse("one hundred and five teaspoons water", "eng").quantity
+				).to.equal(105);
+				expect(
+					parse(
+						"three thousand one hundred and sixty eight teaspoons water",
+						"eng"
+					).quantity
+				).to.equal(3168);
+				expect(
+					parse("four thousand and one teaspoons water", "eng").quantity
+				).to.equal(4001);
+			});
+			it('should handle adjacent magnitude numbers"', () => {
+				expect(
+					parse("four hundred thousand teaspoons water", "eng").quantity
+				).to.equal(400000);
+			});
+			it('should not interfere with values found later in ingredient"', () => {
+				expect(
+					parse(
+						"three hundred fifty grams one hundred percent whole wheat flour",
+						"eng"
+					).quantity
+				).to.equal(350);
+				it('should not parse words that only partially match"', () => {
+					expect(
+						parse("three hundred onerously heavy bags of potatoes", "eng")
+							.quantity
+					).to.equal(300);
+				});
+				it('should convert written fractions"', () => {
+					expect(
+						parse("one and a half teaspoons water", "eng").quantity
+					).to.equal(1.5);
+				});
 			});
 		});
 

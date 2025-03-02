@@ -48,7 +48,7 @@ export function toTasteRecognize(
 
 // return format = [unit, unitPlural, symbol, originalUnit]
 function getUnit(
-	quantity: string,
+	quantity: string | null,
 	input: string,
 	language: SupportedLanguages
 ): string[] {
@@ -116,9 +116,13 @@ function getPreposition(input: string, language: SupportedLanguages) {
 	return null;
 }
 
-function convertToNumber(input: string, language: SupportedLanguages): number {
+function convertToNumber(
+	input: string,
+	language: SupportedLanguages
+): number | undefined {
 	const { isCommaDelimited } = i18nMap[language];
-	if (!input) return 0;
+	// info: updated to return undefined (was "0") if no quantity is provided. Avoids forcing a nonsensical zero quantity & allows the plugin-level result to fall back to null for non-quantified items. Users can identify and specify behavior for null values when consuming.
+	if (!input) return;
 
 	return +input.replace(isCommaDelimited ? /\./ : /,/, "").replace(/,/, ".");
 }
@@ -131,8 +135,10 @@ export function parse(recipeString: string, language: SupportedLanguages) {
 	let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
 		ingredientLine,
 		language
-	) as string[];
-	quantity = convert.convertFromFraction(quantity, language);
+	);
+	if (quantity) {
+		quantity = convert.convertFromFraction(quantity, language);
+	}
 
 	/* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
   For example: "sugar (or other sweetener)" --> extraInfo: "(or other sweetener)" */
@@ -146,7 +152,7 @@ export function parse(recipeString: string, language: SupportedLanguages) {
 		quantity,
 		restOfIngredient,
 		language
-	) as string[];
+	);
 
 	// remove unit from the ingredient if one was found and trim leading and trailing whitespace
 	let ingredient = originalUnit
@@ -169,15 +175,15 @@ export function parse(recipeString: string, language: SupportedLanguages) {
 		quantity = minQty;
 	}
 	return {
-		quantity: convertToNumber(quantity, language),
+		quantity: (quantity && convertToNumber(quantity, language)) ?? null,
 		unit: unit ? unit : null,
 		unitPlural: unitPlural ? unitPlural : null,
 		symbol: symbol ? symbol : null,
 		ingredient: extraInfo
 			? `${ingredient} ${extraInfo}`
 			: ingredient.replace(/( )*\.( )*/g, ""),
-		minQty: convertToNumber(minQty, language),
-		maxQty: convertToNumber(maxQty, language),
+		minQty: (minQty && convertToNumber(minQty, language)) ?? null,
+		maxQty: (maxQty && convertToNumber(maxQty, language)) ?? null,
 	};
 }
 

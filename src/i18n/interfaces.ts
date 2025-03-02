@@ -5,6 +5,7 @@ export type LanguageConfig = {
 	symbolUnits: { [key: string]: string };
 	prepositions: string[];
 	joiners: string[];
+	additiveJoiners: string[];
 	toTaste: string[];
 	numbersSmall: { [key: string]: number };
 	numbersMagnitude: { [key: string]: number };
