@@ -70,63 +70,64 @@ export function parseWrittenNumber(
 	let [smallValue, result]: number[] = [0, 0];
 	let restOfIngredient: string = input;
 	const { numbersSmall, numbersMagnitude, additiveJoiners } = i18nMap[language];
-	let previousMatch: number | null = null;
+	type Match = [text: string, value: number];
+	let previousMatch: Match | null = null;
 
-	const parseSection = (section: string) => {
+	sections.every((section) => {
+		// if no matches found in section, loop will break
+
 		// ignore additive joiners and continue to parse next section
 		if (additiveJoiners.includes(section)) {
 			return true;
 		}
 
-		const applyMatch = (
-			match: number,
-			type: "small" | "magnitude",
-			trimFromIngredient: string
-		) => {
+		const applyMatch = (match: Match, type: "small" | "magnitude") => {
 			if (type === "small") {
 				// addition accounts for juxtaposed small values, e.g. "twenty one"
-				smallValue += match;
+				smallValue += match[1];
 			} else {
 				// process magnitude value
-				if (previousMatch && previousMatch >= 100) {
+				if (previousMatch && previousMatch[1] >= 100) {
 					// previous match was a magnitude value, e.g. "hundred thousand"
-					result = result * match;
+					result = result * match[1];
 				} else {
 					// previous match was a small value, e.g. "one thousand"
-					result += (smallValue ? smallValue : 1) * match;
+					result += (smallValue ? smallValue : 1) * match[1];
 				}
 				// after magnitude value, small value no longer has been expended (e.g. "five thousand" -- five has been applied and should be reset)
 				smallValue = 0;
 			}
-			if (trimFromIngredient) {
-				let partialRegex = new RegExp(`^${trimFromIngredient}\\s*`, "g");
+			if (match[0]) {
+				let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
 				restOfIngredient = restOfIngredient.replace(partialRegex, "");
 				previousMatch = match;
 				return true;
 			}
 		};
 
-		let match: number | null = null;
+		let match: Match | null = null;
 		let partialMatches: {
 			partialMatch: [string, number];
 			type: "small" | "magnitude";
 		}[] = [];
-		let findMatches = (workingSection: string): any => {
+		let findMatches = (section: string): any => {
+			let workingSection = section;
+
 			// entire string matches small value
-			match = numbersSmall[section];
-			if (!!match) {
-				applyMatch(match, "small", section);
+			match = [section, numbersSmall[section]];
+			if (!!match[1]) {
+				applyMatch([section, match[1]], "small");
 				return true;
 			}
 			// entire string matches magnitude value
-			match = numbersMagnitude[section];
-			if (!!match) {
-				applyMatch(match, "magnitude", section);
+			match = [section, numbersMagnitude[section]];
+			if (!!match[1]) {
+				applyMatch([section, match[1]], "magnitude");
 				return true;
 			}
 
 			// no complete match found, look for partial matches
-			let partialMatch: [string, number] | null = null;
+			let partialMatch: Match | null = null;
 			partialMatch =
 				Object.entries(numbersSmall).find(([key, _]) => {
 					return workingSection.startsWith(key);
@@ -147,23 +148,18 @@ export function parseWrittenNumber(
 			if (workingSection.length === 0) {
 				// entire string parsed and all sections matched
 				partialMatches.forEach(({ partialMatch, type }) =>
-					applyMatch(partialMatch[1], type, partialMatch[0])
+					applyMatch(partialMatch, type)
 				);
 				return true;
-			} else if (match) {
+			} else if (partialMatch) {
 				// match found, keep parsing
 				return findMatches(workingSection);
 			} else {
-				// non-matching section found, reject result
+				// no full or partial match, reject result
 				return false;
 			}
 		};
 		return findMatches(section);
-	};
-
-	sections.every((section) => {
-		// if no matches found in section, loop will break
-		return parseSection(section);
 	});
 
 	// no matches found -- return full string
