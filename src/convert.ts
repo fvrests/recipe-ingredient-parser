@@ -106,65 +106,59 @@ export function parseWrittenNumber(
 			}
 		};
 
-		// entire string matches small value
-		let match: number = numbersSmall[section];
-		if (!!match) {
-			applyMatch(match, "small", section);
-			return true;
-		}
-		// entire string matches magnitude value
-		match = numbersMagnitude[section];
-		if (!!match) {
-			applyMatch(match, "magnitude", section);
-			return true;
-		}
+		let match: number | null = null;
+		let partialMatches: {
+			partialMatch: [string, number];
+			type: "small" | "magnitude";
+		}[] = [];
+		let findMatches = (workingSection: string): any => {
+			// entire string matches small value
+			match = numbersSmall[section];
+			if (!!match) {
+				applyMatch(match, "small", section);
+				return true;
+			}
+			// entire string matches magnitude value
+			match = numbersMagnitude[section];
+			if (!!match) {
+				applyMatch(match, "magnitude", section);
+				return true;
+			}
 
-		const getPartialMatches = (
-			section: string
-		): { match: [string, number]; type: "small" | "magnitude" }[] | null => {
-			let partialMatches: { match: [string, number]; type: string }[] = [];
-			let match: [string, number] | null = null;
-			let findMatch = (workingSection: string): any => {
-				match =
-					Object.entries(numbersSmall).find(([key, _]) => {
+			// no complete match found, look for partial matches
+			let partialMatch: [string, number] | null = null;
+			partialMatch =
+				Object.entries(numbersSmall).find(([key, _]) => {
+					return workingSection.startsWith(key);
+				}) ?? null;
+			if (partialMatch) {
+				partialMatches.push({ partialMatch, type: "small" });
+				workingSection = workingSection.replace(partialMatch[0], "");
+			} else {
+				partialMatch =
+					Object.entries(numbersMagnitude).find(([key, _]) => {
 						return workingSection.startsWith(key);
 					}) ?? null;
-				if (match) {
-					partialMatches.push({ match, type: "small" });
-					workingSection = workingSection.replace(match[0], "");
-				} else {
-					match =
-						Object.entries(numbersMagnitude).find(([key, _]) => {
-							return workingSection.startsWith(key);
-						}) ?? null;
-					if (match) {
-						partialMatches.push({ match, type: "magnitude" });
-						workingSection = workingSection.replace(match[0], "");
-					}
+				if (partialMatch) {
+					partialMatches.push({ partialMatch, type: "magnitude" });
+					workingSection = workingSection.replace(partialMatch[0], "");
 				}
-				if (workingSection.length === 0) {
-					// entire string parsed and all sections matched
-					return partialMatches;
-				} else if (match) {
-					// match found, keep parsing
-					return findMatch(workingSection);
-				} else {
-					// non-matching section found, reject result
-					return null;
-				}
-			};
-			return findMatch(section);
+			}
+			if (workingSection.length === 0) {
+				// entire string parsed and all sections matched
+				partialMatches.forEach(({ partialMatch, type }) =>
+					applyMatch(partialMatch[1], type, partialMatch[0])
+				);
+				return true;
+			} else if (match) {
+				// match found, keep parsing
+				return findMatches(workingSection);
+			} else {
+				// non-matching section found, reject result
+				return false;
+			}
 		};
-
-		// perf: check for simple matches before partials
-		let partialMatches = getPartialMatches(section);
-		if (partialMatches) {
-			partialMatches.forEach(({ match, type }) =>
-				applyMatch(match[1], type, match[0])
-			);
-		}
-		// no matches - return false
-		return false;
+		return findMatches(section);
 	};
 
 	sections.every((section) => {
