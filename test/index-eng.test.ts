@@ -94,18 +94,6 @@ describe("recipe parser eng", () => {
 					parse("four thousand and one teaspoons water", "eng").quantity
 				).to.equal(4001);
 			});
-			it("should parse fractions", () => {
-				expect(parse("a half cup flour", "eng").quantity).to.equal(0.5);
-				expect(parse("three quarters cup flour", "eng").quantity).to.equal(
-					0.75
-				);
-				expect(
-					parse("four and two thirds cups flour", "eng").quantity
-				).to.equal(4.666);
-				expect(parse("eight and a half cups flour", "eng").quantity).to.equal(
-					8.5
-				);
-			});
 			it('should handle adjacent magnitude numbers"', () => {
 				expect(
 					parse("four hundred thousand teaspoons water", "eng").quantity
@@ -125,9 +113,16 @@ describe("recipe parser eng", () => {
 					).to.equal(300);
 				});
 				it('should convert written fractions"', () => {
+					expect(parse("a half cup flour", "eng").quantity).to.equal(0.5);
+					expect(parse("three quarters cup flour", "eng").quantity).to.equal(
+						0.75
+					);
 					expect(
-						parse("one and a half teaspoons water", "eng").quantity
-					).to.equal(1.5);
+						parse("four and two thirds cups flour", "eng").quantity
+					).to.equal(4.666);
+					expect(parse("eight and a half cups flour", "eng").quantity).to.equal(
+						8.5
+					);
 				});
 			});
 		});
