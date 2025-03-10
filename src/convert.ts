@@ -59,7 +59,6 @@ const unicodeObj: { [key: string]: string } = {
 };
 
 // fix: needs some kind of sorting? "trentatre" fails (produces 13) as "tre" is found before "trentatre"
-// fix: should not capture "a" if partial word match e.g. "one and a half" -> "2 nd a half"
 export function parseWrittenNumber(
 	input: string,
 	language: SupportedLanguages
@@ -71,17 +70,18 @@ export function parseWrittenNumber(
 	let restOfIngredient: string = input;
 	const { numbersSmall, numbersMagnitude, additiveJoiners } = i18nMap[language];
 	type Match = [text: string, value: number];
+	type MatchType = "small" | "magnitude";
 	let previousMatch: Match | null = null;
 
 	sections.every((section) => {
-		// if no matches found in section, loop will break
+		let match: Match | null = null;
+		let partialMatches: {
+			partialMatch: [string, number];
+			type: MatchType;
+		}[] = [];
+		// if no matches found in section, returning false will break loop and end parsing
 
-		// ignore additive joiners and continue to parse next section
-		if (additiveJoiners.includes(section)) {
-			return true;
-		}
-
-		const applyMatch = (match: Match, type: "small" | "magnitude") => {
+		const applyMatch = (match: Match, type: MatchType) => {
 			if (type === "small") {
 				// addition accounts for juxtaposed small values, e.g. "twenty one"
 				smallValue += match[1];
@@ -97,54 +97,74 @@ export function parseWrittenNumber(
 				// after magnitude value, small value no longer has been expended (e.g. "five thousand" -- five has been applied and should be reset)
 				smallValue = 0;
 			}
-			if (match[0]) {
-				let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
-				restOfIngredient = restOfIngredient.replace(partialRegex, "");
-				previousMatch = match;
-				return true;
-			}
+			let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
+			restOfIngredient = restOfIngredient.replace(partialRegex, "");
+			previousMatch = match;
+			return true;
 		};
 
-		let match: Match | null = null;
-		let partialMatches: {
-			partialMatch: [string, number];
-			type: "small" | "magnitude";
-		}[] = [];
+		// additive joiner e.g. 'and' - subtotal and continue to parse next section
+		if (additiveJoiners.includes(section)) {
+			let partialRegex = new RegExp(`^and\\s*`, "g");
+			restOfIngredient = restOfIngredient.replace(partialRegex, "");
+			result += smallValue;
+			smallValue = 0;
+			previousMatch = null;
+			return true;
+		}
+
 		let findMatches = (section: string): any => {
 			let workingSection = section;
 
+			match = numbersSmall[section] ? [section, numbersSmall[section]] : null;
 			// entire string matches small value
-			match = [section, numbersSmall[section]];
-			if (!!match[1]) {
-				applyMatch([section, match[1]], "small");
-				return true;
-			}
-			// entire string matches magnitude value
-			match = [section, numbersMagnitude[section]];
-			if (!!match[1]) {
-				applyMatch([section, match[1]], "magnitude");
-				return true;
+			if (match) {
+				if (partialMatches.length > 0) {
+					partialMatches.forEach(({ partialMatch, type }) =>
+						applyMatch(partialMatch, type)
+					);
+					partialMatches = [];
+				}
+				return applyMatch(match, "small");
 			}
 
-			// no complete match found, look for partial matches
+			match = numbersMagnitude[section]
+				? [section, numbersMagnitude[section]]
+				: null;
+			// entire string matches magnitude value
+			if (match) {
+				if (partialMatches) {
+					partialMatches.forEach(({ partialMatch, type }) =>
+						applyMatch(partialMatch, type)
+					);
+				}
+				return applyMatch(match, "magnitude");
+			}
+
+			// no complete match found, test for partial matches
 			let partialMatch: Match | null = null;
+			const recordPartialMatch = (partialMatch: Match, type: MatchType) => {
+				let partialRegex = new RegExp(`^${partialMatch[0]}\\s*`, "g");
+				partialMatches.push({ partialMatch, type });
+				workingSection = workingSection.replace(partialRegex, "");
+			};
+
 			partialMatch =
 				Object.entries(numbersSmall).find(([key, _]) => {
 					return workingSection.startsWith(key);
 				}) ?? null;
 			if (partialMatch) {
-				partialMatches.push({ partialMatch, type: "small" });
-				workingSection = workingSection.replace(partialMatch[0], "");
+				recordPartialMatch(partialMatch, "small");
 			} else {
 				partialMatch =
 					Object.entries(numbersMagnitude).find(([key, _]) => {
 						return workingSection.startsWith(key);
 					}) ?? null;
 				if (partialMatch) {
-					partialMatches.push({ partialMatch, type: "magnitude" });
-					workingSection = workingSection.replace(partialMatch[0], "");
+					recordPartialMatch(partialMatch, "magnitude");
 				}
 			}
+
 			if (workingSection.length === 0) {
 				// entire string parsed and all sections matched
 				partialMatches.forEach(({ partialMatch, type }) =>
@@ -152,7 +172,7 @@ export function parseWrittenNumber(
 				);
 				return true;
 			} else if (partialMatch) {
-				// match found, keep parsing
+				// partial match found, keep parsing
 				return findMatches(workingSection);
 			} else {
 				// no full or partial match, reject result

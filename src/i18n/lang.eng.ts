@@ -140,6 +140,18 @@ const numbersSmall: { [key: string]: number } = {
 };
 
 const numbersMagnitude: { [key: string]: number } = {
+	eighth: 0.125,
+	eighths: 0.125,
+	sixth: 0.333,
+	sixths: 0.333,
+	quarter: 0.25,
+	quarters: 0.25,
+	fourth: 0.25,
+	fourths: 0.25,
+	third: 0.333,
+	thirds: 0.333,
+	half: 0.5,
+	halves: 0.5,
 	hundred: 100,
 	thousand: 1000,
 	million: 1000000,
