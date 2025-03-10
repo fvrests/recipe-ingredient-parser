@@ -126,6 +126,7 @@ const numbersSmall: { [key: string]: number } = {
 	neunzig: 90,
 };
 
+// todo: add fractions and check consistency with common applictions in German
 const numbersMagnitude: { [key: string]: number } = {
 	hundert: 100,
 	tausend: 1000,

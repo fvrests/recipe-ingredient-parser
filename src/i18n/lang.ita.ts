@@ -193,6 +193,7 @@ export const numbersSmall: { [key: string]: number } = {
 	novantotto: 98,
 };
 
+// todo: add fractions and check consistency with common applictions in Italian
 export const numbersMagnitude: { [key: string]: number } = {
 	cento: 100,
 	etto: 100,
