@@ -58,7 +58,6 @@ const unicodeObj: { [key: string]: string } = {
 	"⅒": "1/10",
 };
 
-// fix: needs some kind of sorting? "trentatre" fails (produces 13) as "tre" is found before "trentatre"
 export function parseWrittenNumber(
 	input: string,
 	language: SupportedLanguages
@@ -66,12 +65,11 @@ export function parseWrittenNumber(
 	// split string by 1 or more whitespace characters or dashes
 	const sections = input.split(/[\s-]+/);
 
-	let [smallValue, result]: number[] = [0, 0];
 	let restOfIngredient: string = input;
 	const { numbersSmall, numbersMagnitude, additiveJoiners } = i18nMap[language];
 	type Match = [text: string, value: number];
 	type MatchType = "small" | "magnitude";
-	let previousMatch: Match | null = null;
+	let [accumulator, result]: number[] = [0, 0];
 
 	sections.every((section) => {
 		let match: Match | null = null;
@@ -84,22 +82,19 @@ export function parseWrittenNumber(
 		const applyMatch = (match: Match, type: MatchType) => {
 			if (type === "small") {
 				// addition accounts for juxtaposed small values, e.g. "twenty one"
-				smallValue += match[1];
+				accumulator += match[1];
+			} else if (match[1] === 100) {
+				// process hundred
+				accumulator = (accumulator ? accumulator : 1) * match[1];
 			} else {
 				// process magnitude value
-				if (previousMatch && previousMatch[1] >= 100) {
-					// previous match was a magnitude value, e.g. "hundred thousand"
-					result = result * match[1];
-				} else {
-					// previous match was a small value, e.g. "one thousand"
-					result += (smallValue ? smallValue : 1) * match[1];
-				}
-				// after magnitude value, small value no longer has been expended (e.g. "five thousand" -- five has been applied and should be reset)
-				smallValue = 0;
+				result += (accumulator ? accumulator : 1) * match[1];
+				accumulator = 0;
 			}
+			console.log("processed", match[0], { accumulator, result });
+			// strip match string from beginning of ingredient
 			let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
 			restOfIngredient = restOfIngredient.replace(partialRegex, "");
-			previousMatch = match;
 			return true;
 		};
 
@@ -107,9 +102,6 @@ export function parseWrittenNumber(
 		if (additiveJoiners.includes(section)) {
 			let partialRegex = new RegExp(`^and\\s*`, "g");
 			restOfIngredient = restOfIngredient.replace(partialRegex, "");
-			result += smallValue;
-			smallValue = 0;
-			previousMatch = null;
 			return true;
 		}
 
@@ -149,10 +141,17 @@ export function parseWrittenNumber(
 				workingSection = workingSection.replace(partialRegex, "");
 			};
 
-			partialMatch =
-				Object.entries(numbersSmall).find(([key, _]) => {
-					return workingSection.startsWith(key);
-				}) ?? null;
+			partialMatch = Object.entries(numbersSmall).reduce(
+				(longestMatch: Match | null, [key, value]) => {
+					if (
+						workingSection.startsWith(key) &&
+						(!longestMatch || key.length > longestMatch[0].length)
+					)
+						return [key, value];
+					else return longestMatch;
+				},
+				null
+			);
 			if (partialMatch) {
 				recordPartialMatch(partialMatch, "small");
 			} else {
@@ -183,11 +182,11 @@ export function parseWrittenNumber(
 	});
 
 	// no matches found -- return full string
-	if (result + smallValue < 0) {
+	if (result + accumulator < 0) {
 		return [null, input];
 	} else {
 		// add any remaining small value to result
-		let quantity = result + smallValue;
+		let quantity = result + accumulator;
 		return [quantity.toString(), restOfIngredient];
 	}
 }

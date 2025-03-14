@@ -70,6 +70,12 @@ describe("recipe parser eng", () => {
 				expect(parse("one hundred teaspoons water", "eng").quantity).to.equal(
 					100
 				);
+				expect(
+					parse(
+						"two million four hundred twenty one thousand three hundred sixty two teaspoons water",
+						"eng"
+					).quantity
+				).to.equal(2421362);
 			});
 			it('should convert mixed small & magnitude numbers"', () => {
 				expect(
