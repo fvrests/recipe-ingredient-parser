@@ -91,7 +91,6 @@ export function parseWrittenNumber(
 				result += (accumulator ? accumulator : 1) * match[1];
 				accumulator = 0;
 			}
-			console.log("processed", match[0], { accumulator, result });
 			// strip match string from beginning of ingredient
 			let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
 			restOfIngredient = restOfIngredient.replace(partialRegex, "");
