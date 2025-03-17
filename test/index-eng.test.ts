@@ -63,10 +63,10 @@ describe("recipe parser eng", () => {
 					28
 				);
 			});
-			it('should convert dash-separated numbers"', () => {
+			it("should convert dash-separated numbers", () => {
 				expect(parse("forty-six teaspoons water", "eng").quantity).to.equal(46);
 			});
-			it('should convert magnitude numbers"', () => {
+			it("should convert magnitude numbers", () => {
 				expect(parse("one hundred teaspoons water", "eng").quantity).to.equal(
 					100
 				);
@@ -77,7 +77,7 @@ describe("recipe parser eng", () => {
 					).quantity
 				).to.equal(2421362);
 			});
-			it('should convert mixed small & magnitude numbers"', () => {
+			it("should convert mixed small & magnitude numbers", () => {
 				expect(
 					parse("four thousand one hundred twenty five teaspoons water", "eng")
 						.quantity
@@ -100,25 +100,25 @@ describe("recipe parser eng", () => {
 					parse("four thousand and one teaspoons water", "eng").quantity
 				).to.equal(4001);
 			});
-			it('should handle adjacent magnitude numbers"', () => {
+			it("should handle adjacent magnitude numbers", () => {
 				expect(
 					parse("four hundred thousand teaspoons water", "eng").quantity
 				).to.equal(400000);
 			});
-			it('should not interfere with values found later in ingredient"', () => {
+			it("should not interfere with values found later in ingredient", () => {
 				expect(
 					parse(
 						"three hundred fifty grams one hundred percent whole wheat flour",
 						"eng"
 					).quantity
 				).to.equal(350);
-				it('should not parse words that only partially match"', () => {
+				it("should not parse words that only partially match", () => {
 					expect(
 						parse("three hundred onerously heavy bags of potatoes", "eng")
 							.quantity
 					).to.equal(300);
 				});
-				it('should convert written fractions"', () => {
+				it("should convert written fractions", () => {
 					expect(parse("a half cup flour", "eng").quantity).to.equal(0.5);
 					expect(parse("three quarters cup flour", "eng").quantity).to.equal(
 						0.75
