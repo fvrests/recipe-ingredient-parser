@@ -70,7 +70,7 @@ export function parseWrittenNumber(
 		i18nMap[language];
 	type Match = [text: string, value: number];
 	type MatchType = "small" | "magnitude";
-	let [accumulator, result]: number[] = [0, 0];
+	let [accumulator, result]: number[] = [-1, -1];
 
 	sections.every((section) => {
 		let match: Match | null = null;
@@ -81,6 +81,9 @@ export function parseWrittenNumber(
 		// if no matches found in section, returning false will break loop and end parsing
 
 		const applyMatch = (match: Match, type: MatchType) => {
+			// initialize accumulator and result on first match found
+			if (accumulator + result < 0) [accumulator, result] = [0, 0];
+
 			if (type === "small") {
 				// addition accounts for juxtaposed small values, e.g. "twenty one"
 				accumulator += match[1];

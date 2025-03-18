@@ -54,8 +54,7 @@ describe("recipe parser eng", () => {
 			expect(parse("1,500.50 teaspoon water", "eng").quantity).to.equal(1500.5);
 		});
 
-		// todo: remove only after develop
-		describe.only("converts a written quantity to number", () => {
+		describe("converts a written quantity to number", () => {
 			it("should convert small numbers", () => {
 				expect(parse("zero teaspoons water", "eng").quantity).to.equal(0);
 				expect(parse("one teaspoon water", "eng").quantity).to.equal(1);
@@ -119,7 +118,9 @@ describe("recipe parser eng", () => {
 					).to.equal(300);
 				});
 				it("should convert written fractions", () => {
+					expect(parse("half cup flour", "eng").quantity).to.equal(0.5);
 					expect(parse("a half cup flour", "eng").quantity).to.equal(0.5);
+					expect(parse("one half cup flour", "eng").quantity).to.equal(0.5);
 					expect(parse("three quarters cup flour", "eng").quantity).to.equal(
 						0.75
 					);
@@ -447,12 +448,12 @@ describe("recipe parser eng", () => {
 	it("doesn't explode when no unit and no quantity provided", () => {
 		expect(parse("Powdered Sugar", "eng")).to.deep.equal({
 			ingredient: "Powdered Sugar",
-			quantity: 0,
+			quantity: null,
 			unit: null,
 			unitPlural: null,
 			symbol: null,
-			minQty: 0,
-			maxQty: 0,
+			minQty: null,
+			maxQty: null,
 		});
 	});
 

@@ -9,7 +9,7 @@ describe("recipe parser ita", () => {
 	describe("translates the unit", () => {
 		it('of "qb  di acqua"', () => {
 			expect(parse("qb di acqua", "ita").unit).to.equal("q.b.");
-			expect(parse("qb di acqua", "ita").quantity).to.equal(0);
+			expect(parse("qb di acqua", "ita").quantity).to.equal(null);
 		});
 		it('of "quanto basta  acqua"', () => {
 			expect(parse("quanto basta di acqua", "ita").unit).to.equal("q.b.");
@@ -399,11 +399,11 @@ describe("recipe parser ita", () => {
 				expect(parse("grammi di farina", "ita")).to.deep.equal({
 					unit: "grammo",
 					unitPlural: "grammi",
-					quantity: 0,
+					quantity: null,
 					symbol: "g",
 					ingredient: "farina",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 			it('"100 grammi di farina"', () => {
@@ -531,55 +531,55 @@ describe("recipe parser ita", () => {
 				expect(parse("quanto basta  di latte", "ita")).to.deep.equal({
 					unit: "q.b.",
 					unitPlural: "q.b.",
-					quantity: 0,
+					quantity: null,
 					symbol: null,
 					ingredient: "latte",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 			it('"Quanto Basta  di latte"', () => {
 				expect(parse("quanto basta  di latte", "ita")).to.deep.equal({
 					unit: "q.b.",
 					unitPlural: "q.b.",
-					quantity: 0,
+					quantity: null,
 					symbol: null,
 					ingredient: "latte",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 			it('"qb  di latte"', () => {
 				expect(parse("quanto basta  di latte", "ita")).to.deep.equal({
 					unit: "q.b.",
 					unitPlural: "q.b.",
-					quantity: 0,
+					quantity: null,
 					symbol: null,
 					ingredient: "latte",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 			it('"q.b. di latte"', () => {
 				expect(parse("q.b.  di latte", "ita")).to.deep.equal({
 					unit: "q.b.",
 					unitPlural: "q.b.",
-					quantity: 0,
+					quantity: null,
 					symbol: null,
 					ingredient: "latte",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 			it('"q.b. latte"', () => {
 				expect(parse("q.b.  latte", "ita")).to.deep.equal({
 					unit: "q.b.",
 					unitPlural: "q.b.",
-					quantity: 0,
+					quantity: null,
 					symbol: null,
 					ingredient: "latte",
-					minQty: 0,
-					maxQty: 0,
+					minQty: null,
+					maxQty: null,
 				});
 			});
 		});
@@ -647,9 +647,9 @@ describe("recipe parser ita", () => {
 			unitPlural: "q.b.",
 			symbol: null,
 			ingredient: "sale",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
+			quantity: null,
+			minQty: null,
+			maxQty: null,
 		});
 		expect(parse("100 gr. tortilla ", "ita")).to.deep.equal({
 			unit: "grammo",
@@ -674,27 +674,27 @@ describe("recipe parser ita", () => {
 			unitPlural: "q.b.",
 			symbol: null,
 			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
+			quantity: null,
+			minQty: null,
+			maxQty: null,
 		});
 		expect(parse("basilico q.b.", "ita")).to.deep.equal({
 			unit: "q.b.",
 			unitPlural: "q.b.",
 			symbol: null,
 			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
+			quantity: null,
+			minQty: null,
+			maxQty: null,
 		});
 		expect(parse("basilico QB", "ita")).to.deep.equal({
 			unit: "q.b.",
 			unitPlural: "q.b.",
 			symbol: null,
 			ingredient: "basilico",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
+			quantity: null,
+			minQty: null,
+			maxQty: null,
 		});
 		expect(parse("basilico millilitri 100", "ita")).to.deep.equal({
 			unit: "millilitro",
@@ -712,9 +712,9 @@ describe("recipe parser ita", () => {
 			unitPlural: "q.b.",
 			symbol: null,
 			ingredient: "zucchero a velo",
-			quantity: 0,
-			minQty: 0,
-			maxQty: 0,
+			quantity: null,
+			minQty: null,
+			maxQty: null,
 		});
 	});
 	it("test noci", () => {
