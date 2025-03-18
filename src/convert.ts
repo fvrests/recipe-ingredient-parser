@@ -66,7 +66,8 @@ export function parseWrittenNumber(
 	const sections = input.split(/[\s-]+/);
 
 	let restOfIngredient: string = input;
-	const { numbersSmall, numbersMagnitude, additiveJoiners } = i18nMap[language];
+	const { numbersSmall, numbersMagnitude, additiveJoiners, isCommaDelimited } =
+		i18nMap[language];
 	type Match = [text: string, value: number];
 	type MatchType = "small" | "magnitude";
 	let [accumulator, result]: number[] = [0, 0];
@@ -84,7 +85,7 @@ export function parseWrittenNumber(
 				// addition accounts for juxtaposed small values, e.g. "twenty one"
 				accumulator += match[1];
 			} else if (match[1] === 100) {
-				// process hundred
+				// hundreds should be multiplied into accumulator but not total it out yet - "four hundred twenty six thousand" needs to keep accumulating
 				accumulator = (accumulator ? accumulator : 1) * match[1];
 			} else {
 				// process magnitude value
@@ -188,7 +189,11 @@ export function parseWrittenNumber(
 	} else {
 		// add any remaining small value to result
 		let quantity = result + accumulator;
-		return [quantity.toString(), restOfIngredient];
+		// todo: later if converting to standard BCP 47 language tags, could use Number.prototype.toLocaleString() instead of string replace
+		let localeQuantityString = isCommaDelimited
+			? quantity.toString().replace(".", ",")
+			: quantity.toString();
+		return [localeQuantityString, restOfIngredient];
 	}
 }
 
