@@ -96,16 +96,6 @@ const additiveJoiners = ["and"];
 
 const toTaste = ["to taste"];
 
-// const numbersFraction: { [key: string]: number } = {
-// 	quarter: 0.25,
-// 	quarters: 0.25,
-// 	fourth: 0.25,
-// 	fourths: 0.25,
-// 	third: 0.33,
-// 	thirds: 0.33,
-// 	half: 0.5,
-// };
-
 const numbersSmall: { [key: string]: number } = {
 	zero: 0,
 	one: 1,
@@ -142,8 +132,8 @@ const numbersSmall: { [key: string]: number } = {
 const numbersMagnitude: { [key: string]: number } = {
 	eighth: 0.125,
 	eighths: 0.125,
-	sixth: 0.333,
-	sixths: 0.333,
+	sixth: 0.167,
+	sixths: 0.167,
 	quarter: 0.25,
 	quarters: 0.25,
 	fourth: 0.25,
