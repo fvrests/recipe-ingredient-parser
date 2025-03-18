@@ -92,22 +92,24 @@ export function parseWrittenNumber(
 				accumulator = 0;
 			}
 			// strip match string from beginning of ingredient
-			let partialRegex = new RegExp(`^${match[0]}\\s*`, "g");
+			let partialRegex = new RegExp(`^${match[0]}\\s*`, "gi");
 			restOfIngredient = restOfIngredient.replace(partialRegex, "");
 			return true;
 		};
 
 		// additive joiner e.g. 'and' - subtotal and continue to parse next section
 		if (additiveJoiners.includes(section)) {
-			let partialRegex = new RegExp(`^and\\s*`, "g");
+			let partialRegex = new RegExp(`^${section}\\s*`, "gi");
 			restOfIngredient = restOfIngredient.replace(partialRegex, "");
 			return true;
 		}
 
 		let findMatches = (section: string): any => {
-			let workingSection = section;
+			let workingSection = section.toLowerCase();
 
-			match = numbersSmall[section] ? [section, numbersSmall[section]] : null;
+			match = numbersSmall[workingSection]
+				? [workingSection, numbersSmall[workingSection]]
+				: null;
 			// entire string matches small value
 			if (match) {
 				if (partialMatches.length > 0) {
@@ -119,8 +121,8 @@ export function parseWrittenNumber(
 				return applyMatch(match, "small");
 			}
 
-			match = numbersMagnitude[section]
-				? [section, numbersMagnitude[section]]
+			match = numbersMagnitude[workingSection]
+				? [workingSection, numbersMagnitude[workingSection]]
 				: null;
 			// entire string matches magnitude value
 			if (match) {
@@ -135,7 +137,7 @@ export function parseWrittenNumber(
 			// no complete match found, test for partial matches
 			let partialMatch: Match | null = null;
 			const recordPartialMatch = (partialMatch: Match, type: MatchType) => {
-				let partialRegex = new RegExp(`^${partialMatch[0]}\\s*`, "g");
+				let partialRegex = new RegExp(`^${partialMatch[0]}\\s*`, "gi");
 				partialMatches.push({ partialMatch, type });
 				workingSection = workingSection.replace(partialRegex, "");
 			};
@@ -164,7 +166,7 @@ export function parseWrittenNumber(
 			}
 
 			if (workingSection.length === 0) {
-				// entire string parsed and all sections matched
+				// entire section parsed and all parts matched
 				partialMatches.forEach(({ partialMatch, type }) =>
 					applyMatch(partialMatch, type)
 				);
