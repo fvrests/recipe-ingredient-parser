@@ -132,10 +132,6 @@ const toTaste = ["quanto basta"];
 
 export const numbersSmall: { [key: string]: number } = {
 	zero: 0,
-	mezzo: 0.5,
-	mezza: 0.5,
-	metà: 0.5,
-	meta: 0.5,
 	uno: 1,
 	una: 1,
 	un: 1,
@@ -193,8 +189,19 @@ export const numbersSmall: { [key: string]: number } = {
 	novantotto: 98,
 };
 
-// todo: add fractions and check consistency with common applictions in Italian
 export const numbersMagnitude: { [key: string]: number } = {
+	ottavo: 0.2,
+	ottavi: 0.2,
+	sesto: 0.167,
+	sesti: 0.167,
+	quarto: 0.25,
+	quarti: 0.25,
+	terzo: 0.333,
+	terzi: 0.333,
+	mezzo: 0.5,
+	mezza: 0.5,
+	metà: 0.5,
+	meta: 0.5,
 	cento: 100,
 	etto: 100,
 	mille: 1000,
