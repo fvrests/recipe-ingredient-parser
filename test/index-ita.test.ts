@@ -73,45 +73,83 @@ describe("recipe parser ita", () => {
 			expect(parse("about 1/2 cucchiaio acqua", "ita").quantity).to.equal(0.5);
 		});
 
-		describe("translates the quantity from string to number", () => {
-			it("Un cucchiaio d'acqua", () => {
-				expect(parse("Un cucchiaio d'acqua", "ita").quantity).to.equal(1);
+		describe("converts a written quantity to number", () => {
+			it("should convert small numbers", () => {
+				expect(parse("Un cucchiaio d'acqua", "ita").quantity, "un").to.equal(1);
+				expect(
+					parse("cinque cucchiai d'acqua", "ita").quantity,
+					"cinque"
+				).to.equal(5);
+				expect(
+					parse("Venti cucchiai d'acqua", "ita").quantity,
+					"venti"
+				).to.equal(20);
+				expect(
+					parse("ventuno cucchiai d'acqua", "ita").quantity,
+					"ventuno"
+				).to.equal(21);
 			});
-			it("Un cucchiaio d'acqua", () => {
-				expect(parse("Un cucchiaio d'acqua", "ita").quantity).to.equal(1);
-			});
-			it("mezzo cucchiaio d'acqua", () => {
-				expect(parse("mezzo cucchiaio d'acqua", "ita").quantity).to.equal(0.5);
-			});
-			it("meta cucchiaio d'acqua", () => {
-				expect(parse("meta cucchiaio d'acqua", "ita").quantity).to.equal(0.5);
-			});
-			it("Venti cucchiai d'acqua\"", () => {
-				expect(parse("Venti cucchiai d'acqua", "ita").quantity).to.equal(20);
-			});
-			it("cinque cucchiai d'acqua\"", () => {
-				expect(parse("cinque cucchiai d'acqua", "ita").quantity).to.equal(5);
-			});
-			it("ventuno cucchiai d'acqua\"", () => {
-				expect(parse("ventuno cucchiai d'acqua", "ita").quantity).to.equal(21);
-			});
-			it("mezzo spicchio d'aglio\"", () => {
-				expect(parse("mezzo spicchio d'aglio", "ita").quantity).to.equal(0.5);
-			});
-			it("cento grammi d'aglio\"", () => {
-				expect(parse("cento grammi d'aglio", "ita").quantity).to.equal(100);
-			});
-			it("cento-due grammi d'aglio\"", () => {
+			it("should convert dash-separated numbers", () => {
 				expect(parse("cento-due grammi d'aglio", "ita").quantity).to.equal(102);
-			});
-			it("due-cento grammi d'aglio\"", () => {
 				expect(parse("due-cento grammi d'aglio", "ita").quantity).to.equal(200);
-			});
-			it("due-mila grammi d'aglio\"", () => {
 				expect(parse("due-mila grammi d'aglio", "ita").quantity).to.equal(2000);
 			});
-			it('due grammi farina"', () => {
-				expect(parse("due grammi farina", "ita").quantity).to.equal(2);
+			it("should convert magnitude numbers", () => {
+				expect(parse("cento grammi d'aglio", "ita").quantity).to.equal(100);
+			});
+			it("should convert mixed small & magnitude numbers", () => {
+				expect(parse("tremilacentosessantotto", "ita").quantity).to.equal(3168);
+			});
+			it("should not fail when some keys fully contain others", () => {
+				expect(parse("tredici cucchiai d'acqua", "ita").quantity).to.equal(13);
+				expect(parse("trentatre cucchiai d'acqua", "ita").quantity).to.equal(
+					33
+				);
+			});
+			it("should handle cases with `and`", () => {
+				expect(
+					parse("due mille e cinque bicchieri d'acqua", "ita").quantity
+				).to.equal(2005);
+			});
+			it("should handle adjacent magnitude numbers", () => {
+				expect(
+					parse("quattrocentomila bicchieri d'acqua", "ita").quantity
+				).to.equal(400000);
+			});
+			it("should not interfere with values found later in ingredient", () => {
+				expect(
+					parse(
+						"trecentocinquanta grammi di farina integrale al cento per cento",
+						"ita"
+					).quantity
+				).to.equal(350);
+			});
+			it("should not parse words that only partially match", () => {
+				expect(
+					parse("venti ottobre frutti di stagione", "ita").quantity
+				).to.equal(20);
+			});
+			it("should convert written fractions", () => {
+				expect(
+					parse("mezzo cucchiaio d'acqua", "ita").quantity,
+					"mezzo"
+				).to.equal(0.5);
+				expect(
+					parse("un mezzo cucchiaio d'acqua", "ita").quantity,
+					"un mezzo"
+				).to.equal(0.5);
+				expect(
+					parse("meta cucchiaio d'acqua", "ita").quantity,
+					"meta"
+				).to.equal(0.5);
+				expect(
+					parse("due terzi cucchiaio d'acqua", "ita").quantity,
+					"due terzi"
+				).to.equal(0.666);
+				expect(
+					parse("tre quarti cucchiaio d'acqua", "ita").quantity,
+					"tre quarti"
+				).to.equal(0.75);
 			});
 		});
 
