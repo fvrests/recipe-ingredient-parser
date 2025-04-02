@@ -64,7 +64,6 @@ export function parseWrittenNumber(
 ): [quantity: string | null, restOfIngredient: string] {
 	// split string by 1 or more whitespace characters or dashes
 	const sections = input.split(/[\s-]+/);
-
 	let restOfIngredient: string = input;
 	const { numbersSmall, numbersMagnitude, additiveJoiners, isCommaDelimited } =
 		i18nMap[language];
@@ -101,15 +100,15 @@ export function parseWrittenNumber(
 			return true;
 		};
 
-		// additive joiner e.g. 'and' - subtotal and continue to parse next section
-		if (additiveJoiners.includes(section)) {
-			let partialRegex = new RegExp(`^${section}\\s*`, "gi");
-			restOfIngredient = restOfIngredient.replace(partialRegex, "");
-			return true;
-		}
-
 		let findMatches = (section: string): any => {
 			let workingSection = section.toLowerCase();
+
+			// entire string matches additive joiner e.g. 'and' - strip out and continue to parse next section
+			if (additiveJoiners.includes(workingSection)) {
+				let partialRegex = new RegExp(`^${workingSection}\\s*`, "gi");
+				restOfIngredient = restOfIngredient.replace(partialRegex, "");
+				return true;
+			}
 
 			match = numbersSmall[workingSection]
 				? [workingSection, numbersSmall[workingSection]]
@@ -146,26 +145,36 @@ export function parseWrittenNumber(
 				workingSection = workingSection.replace(partialRegex, "");
 			};
 
-			partialMatch = Object.entries(numbersSmall).reduce(
-				(longestMatch: Match | null, [key, value]) => {
-					if (
-						workingSection.startsWith(key) &&
-						(!longestMatch || key.length > longestMatch[0].length)
-					)
-						return [key, value];
-					else return longestMatch;
-				},
-				null
-			);
-			if (partialMatch) {
-				recordPartialMatch(partialMatch, "small");
+			// partial match with additive joiner - strip out
+			let additiveMatch =
+				additiveJoiners.find((joiner) => {
+					return workingSection.startsWith(joiner);
+				}) ?? null;
+			if (additiveMatch) {
+				let partialRegex = new RegExp(`^${additiveMatch}\\s*`, "gi");
+				workingSection = workingSection.replace(partialRegex, "");
 			} else {
-				partialMatch =
-					Object.entries(numbersMagnitude).find(([key, _]) => {
-						return workingSection.startsWith(key);
-					}) ?? null;
+				partialMatch = Object.entries(numbersSmall).reduce(
+					(longestMatch: Match | null, [key, value]) => {
+						if (
+							workingSection.startsWith(key) &&
+							(!longestMatch || key.length > longestMatch[0].length)
+						)
+							return [key, value];
+						else return longestMatch;
+					},
+					null
+				);
 				if (partialMatch) {
-					recordPartialMatch(partialMatch, "magnitude");
+					recordPartialMatch(partialMatch, "small");
+				} else {
+					partialMatch =
+						Object.entries(numbersMagnitude).find(([key, _]) => {
+							return workingSection.startsWith(key);
+						}) ?? null;
+					if (partialMatch) {
+						recordPartialMatch(partialMatch, "magnitude");
+					}
 				}
 			}
 
@@ -175,8 +184,8 @@ export function parseWrittenNumber(
 					applyMatch(partialMatch, type)
 				);
 				return true;
-			} else if (partialMatch) {
-				// partial match found, keep parsing
+			} else if (additiveMatch || partialMatch) {
+				// match found, keep parsing
 				return findMatches(workingSection);
 			} else {
 				// no full or partial match, reject result

@@ -126,8 +126,16 @@ const numbersSmall: { [key: string]: number } = {
 	neunzig: 90,
 };
 
-// todo: add fractions and check consistency with common applictions in German
 const numbersMagnitude: { [key: string]: number } = {
+	achtel: 0.125,
+	sechstel: 0.167,
+	viertel: 0.25,
+	drittel: 0.333,
+	halb: 0.5,
+	halber: 0.5,
+	halbes: 0.5,
+	halben: 0.5,
+	hälfte: 0.5,
 	hundert: 100,
 	tausend: 1000,
 	million: 1000000,
