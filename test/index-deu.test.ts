@@ -29,23 +29,118 @@ describe("recipe parser deu", () => {
 			expect(parse("about 1/2 teelöffel Wasser", "deu").quantity).to.equal(0.5);
 		});
 
-		describe("translates the quantity from string to number", () => {
-			it('ein teelöffel Wasser"', () => {
-				expect(parse("ein teelöffel Wasser", "deu").quantity).to.equal(1);
+		describe("converts a written quantity to number", () => {
+			it("should convert small numbers", () => {
+				expect(parse("ein teelöffel Wasser", "deu").quantity, "ein").to.equal(
+					1
+				);
+				expect(parse("fünf teelöffel Wasser", "deu").quantity, "fünf").to.equal(
+					5
+				);
+				expect(
+					parse("zwanzig teelöffel Wasser", "deu").quantity,
+					"zwanzig"
+				).to.equal(20);
+				expect(
+					parse("einundzwanzig teelöffel Wasser", "deu").quantity,
+					"einundzwanzig"
+				).to.equal(21);
 			});
-
-			it('ein teelöffel Wasser"', () => {
-				expect(parse("eine teelöffel Wasser", "deu").quantity).to.equal(1);
+			it("should convert dash-separated numbers", () => {
+				// unsure if this is applicable / needed in German language - possible RFC
+				expect(
+					parse("ein-und-zwanzig teelöffel Wasser", "deu").quantity,
+					"ein-und-zwanzig"
+				).to.equal(21);
 			});
-
-			it('ein teelöffel Wasser"', () => {
-				expect(parse("einen teelöffel Wasser", "deu").quantity).to.equal(1);
+			it("should convert magnitude numbers", () => {
+				expect(
+					parse("hundert Gramm Knoblauch", "deu").quantity,
+					"hundert"
+				).to.equal(100);
 			});
-			it('zwanzig teelöffel Wasser"', () => {
-				expect(parse("zwanzig teelöffel Wasser", "deu").quantity).to.equal(20);
+			it("should convert mixed small & magnitude numbers", () => {
+				expect(
+					parse("dreitausendeinhundertachtundsechzig Gramm Mehl", "deu")
+						.quantity,
+					"dreitausendeinhundertachtundsechzig"
+				).to.equal(3168);
 			});
-			it('fünf teelöffel Wasser"', () => {
-				expect(parse("fünf teelöffel Wasser", "deu").quantity).to.equal(5);
+			it("should not fail when some keys fully contain others", () => {
+				expect(
+					parse("dreizehn Teelöffel Wasser", "deu").quantity,
+					"dreizehn"
+				).to.equal(13);
+				expect(
+					parse("vierzehn Teelöffel Wasser", "deu").quantity,
+					"vierzehn"
+				).to.equal(14);
+				expect(
+					parse("fünfzehn Teelöffel Wasser", "deu").quantity,
+					"fünfzehn "
+				).to.equal(15);
+				expect(
+					parse("sechszehn Teelöffel Wasser", "deu").quantity,
+					"sechszehn"
+				).to.equal(16);
+				expect(
+					parse("ein viertel Teelöffel Wasser", "deu").quantity,
+					"ein viertel"
+				).to.equal(0.25);
+			});
+			it("should handle cases with `and`", () => {
+				expect(
+					parse("siebenundzwanzig Gramm Mehl", "deu").quantity,
+					"siebenundzwanzig"
+				).to.equal(27);
+				expect(
+					parse("eintausendundeins Gramm Mehl", "deu").quantity,
+					"eintausendundeins"
+				).to.equal(1001);
+			});
+			it("should handle adjacent magnitude numbers", () => {
+				expect(
+					parse("fünfhunderttausend Gramm Mehl", "deu").quantity,
+					"fünfhunderttausend"
+				).to.equal(500000);
+			});
+			it("should not interfere with values found later in ingredient", () => {
+				expect(
+					parse("einhundert Gramm Beeren mit drei Dornen", "deu").quantity
+				).to.equal(100);
+			});
+			it("should not parse words that only partially match", () => {
+				expect(
+					parse("zwanzig zweifellos köstliche Beeren", "deu").quantity
+				).to.equal(20);
+			});
+			it("should convert written fractions", () => {
+				expect(
+					parse("ein halber Teelöffel Wasser", "deu").quantity,
+					"halber"
+				).to.equal(0.5);
+				expect(
+					parse("einen halben Teelöffel Wasser", "deu").quantity,
+					"halben"
+				).to.equal(0.5);
+				expect(
+					parse("zwei Drittel Teelöffel Wasser", "deu").quantity,
+					"zwei Drittel"
+				).to.equal(0.666);
+				expect(
+					parse("dreiviertel Teelöffel Wasser", "deu").quantity,
+					"dreiviertel"
+				).to.equal(0.75);
+				expect(
+					parse("drei Viertel Teelöffel Wasser", "deu").quantity,
+					"dreiviertel"
+				).to.equal(0.75);
+			});
+			it("should be case-insensitive", () => {
+				expect(
+					parse("FünfuNdzwAnzIg Teelöffel Wasser", "deu").quantity,
+					"FünfuNdzwAnzIg"
+				).to.equal(25);
 			});
 		});
 
