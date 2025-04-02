@@ -41,7 +41,6 @@ describe("recipe parser ita", () => {
 		it('of "acqua quanto basta"', () => {
 			expect(parse("acqua quanto basta", "ita").unit).to.equal("q.b.");
 		});
-
 		it('of "QB di acqua"', () => {
 			expect(parse("QB di acqua", "ita").unit).to.equal("q.b.");
 		});
@@ -51,6 +50,9 @@ describe("recipe parser ita", () => {
 		it('of "Q.B di acqua"', () => {
 			expect(parse("Q.b di acqua", "ita").unit).to.equal("q.b.");
 		});
+	});
+
+	describe("translates the quantity", () => {
 		it('of "1 cucchiaio acqua"', () => {
 			expect(parse("1 cucchiaio acqua", "ita").quantity).to.equal(1);
 		});
@@ -75,13 +77,13 @@ describe("recipe parser ita", () => {
 
 		describe("converts a written quantity to number", () => {
 			it("should convert small numbers", () => {
-				expect(parse("Un cucchiaio d'acqua", "ita").quantity, "un").to.equal(1);
+				expect(parse("un cucchiaio d'acqua", "ita").quantity, "un").to.equal(1);
 				expect(
 					parse("cinque cucchiai d'acqua", "ita").quantity,
 					"cinque"
 				).to.equal(5);
 				expect(
-					parse("Venti cucchiai d'acqua", "ita").quantity,
+					parse("venti cucchiai d'acqua", "ita").quantity,
 					"venti"
 				).to.equal(20);
 				expect(
@@ -90,30 +92,54 @@ describe("recipe parser ita", () => {
 				).to.equal(21);
 			});
 			it("should convert dash-separated numbers", () => {
-				expect(parse("cento-due grammi d'aglio", "ita").quantity).to.equal(102);
-				expect(parse("due-cento grammi d'aglio", "ita").quantity).to.equal(200);
-				expect(parse("due-mila grammi d'aglio", "ita").quantity).to.equal(2000);
+				expect(
+					parse("cento-due grammi d'aglio", "ita").quantity,
+					"cento-due"
+				).to.equal(102);
+				expect(
+					parse("due-cento grammi d'aglio", "ita").quantity,
+					"due-cento"
+				).to.equal(200);
+				expect(
+					parse("due-mila grammi d'aglio", "ita").quantity,
+					"due-mila"
+				).to.equal(2000);
 			});
 			it("should convert magnitude numbers", () => {
-				expect(parse("cento grammi d'aglio", "ita").quantity).to.equal(100);
+				expect(parse("cento grammi d'aglio", "ita").quantity, "cento").to.equal(
+					100
+				);
 			});
 			it("should convert mixed small & magnitude numbers", () => {
-				expect(parse("tremilacentosessantotto", "ita").quantity).to.equal(3168);
+				expect(
+					parse("tremilacentosessantotto", "ita").quantity,
+					"tremilacentosessantotto"
+				).to.equal(3168);
 			});
 			it("should not fail when some keys fully contain others", () => {
-				expect(parse("tredici cucchiai d'acqua", "ita").quantity).to.equal(13);
-				expect(parse("trentatre cucchiai d'acqua", "ita").quantity).to.equal(
-					33
-				);
+				expect(
+					parse("undici cucchiai d'acqua", "ita").quantity,
+					"undici"
+				).to.equal(11);
+				expect(
+					parse("tredici cucchiai d'acqua", "ita").quantity,
+					"tredici"
+				).to.equal(13);
+				expect(
+					parse("trentatre cucchiai d'acqua", "ita").quantity,
+					"trentatre"
+				).to.equal(33);
 			});
 			it("should handle cases with `and`", () => {
 				expect(
-					parse("due mille e cinque bicchieri d'acqua", "ita").quantity
+					parse("due mille e cinque bicchieri d'acqua", "ita").quantity,
+					"due mille e cinque"
 				).to.equal(2005);
 			});
 			it("should handle adjacent magnitude numbers", () => {
 				expect(
-					parse("quattrocentomila bicchieri d'acqua", "ita").quantity
+					parse("quattrocentomila bicchieri d'acqua", "ita").quantity,
+					"quattrocentomila "
 				).to.equal(400000);
 			});
 			it("should not interfere with values found later in ingredient", () => {
@@ -126,7 +152,8 @@ describe("recipe parser ita", () => {
 			});
 			it("should not parse words that only partially match", () => {
 				expect(
-					parse("venti ottobre frutti di stagione", "ita").quantity
+					parse("venti ottobre frutti di stagione", "ita").quantity,
+					"venti ottobre frutti di stagione"
 				).to.equal(20);
 			});
 			it("should convert written fractions", () => {
@@ -151,19 +178,13 @@ describe("recipe parser ita", () => {
 					"tre quarti"
 				).to.equal(0.75);
 			});
+			it("should be case-insensitive", () => {
+				expect(
+					parse("veNtiCinQue cucchiai d'acqua", "ita").quantity,
+					"veNtiCinQue"
+				).to.equal(25);
+			});
 		});
-
-		//  describe('translates the quantity range', () => {
-		//    it('of "10-20 cucchiaio acqua"', () => {
-		//      expect(parse('10-20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
-		//    });
-		//    it('of "10 - 20 cucchiaio acqua"', () => {
-		//      expect(parse('10 - 20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
-		//    });
-		//    it('of "10 to 20 cucchiaio acqua"', () => {
-		//      expect(parse('10 to 20 cucchiaio acqua', 'ita').quantity).to.equal('10-20');
-		//    });
-		//  });
 
 		describe("of unicode fractions", () => {
 			const unicodeAmounts = [
@@ -841,9 +862,6 @@ describe("recipe parser ita", () => {
 		it('"1 cucchiaio latte"', () => {
 			expect(parse("1 cucchiaio latte", "ita").ingredient).to.equal("latte");
 		});
-	});
-
-	describe("translates the ingredient of", () => {
 		it('"1 g di latte"', () => {
 			expect(parse("1 g di  latte", "ita").ingredient).to.equal("latte");
 		});

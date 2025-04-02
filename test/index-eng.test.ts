@@ -6,28 +6,49 @@ describe("recipe parser eng", () => {
 		expect(typeof parse("1 cup water", "eng")).to.equal("object");
 	});
 
+	describe("translates the base unit", () => {
+		it('of "salt t.t."', () => {
+			expect(parse("water t.t.", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt to taste"', () => {
+			expect(parse("salt to taste", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt To taste"', () => {
+			expect(parse("salt to taste", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt t.t."', () => {
+			expect(parse("salt t.t.", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt TT"', () => {
+			expect(parse("salt TT", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt TT."', () => {
+			expect(parse("salt TT.", "eng").unit).to.equal("t.t.");
+		});
+		it('of "salt T.t"', () => {
+			expect(parse("salt T.t", "eng").unit).to.equal("t.t.");
+		});
+		it('of "to taste of salt"', () => {
+			expect(parse("to taste of salt", "eng").unit).to.equal("t.t.");
+		});
+		it('of "To taste of salt"', () => {
+			expect(parse("To taste of salt", "eng").unit).to.equal("t.t.");
+		});
+		it('of "t.t. of salt"', () => {
+			expect(parse("t.t. of salt", "eng").unit).to.equal("t.t.");
+		});
+		it('of "TT of salt"', () => {
+			expect(parse("TT of salt", "eng").unit).to.equal("t.t.");
+		});
+		it('of "TT. of salt"', () => {
+			expect(parse("TT. of salt", "eng").unit).to.equal("t.t.");
+		});
+		it('of "T.t of salt"', () => {
+			expect(parse("T.t of salt", "eng").unit).to.equal("t.t.");
+		});
+	});
+
 	describe("translates the quantity", () => {
-		it('of "to taste of water"', () => {
-			expect(parse("to taste of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "To taste of water"', () => {
-			expect(parse("To taste of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "t.t. of water"', () => {
-			expect(parse("t.t. of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "t.t. of water"', () => {
-			expect(parse("t.t. of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "TT of water"', () => {
-			expect(parse("TT of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "TT. of water"', () => {
-			expect(parse("TT. of water", "eng").unit).to.equal("t.t.");
-		});
-		it('of "T.t of water"', () => {
-			expect(parse("T.t of water", "eng").unit).to.equal("t.t.");
-		});
 		it('of "1 teaspoon water"', () => {
 			expect(parse("1 teaspoon water", "eng").quantity).to.equal(1);
 		});
@@ -56,52 +77,68 @@ describe("recipe parser eng", () => {
 
 		describe("converts a written quantity to number", () => {
 			it("should convert small numbers", () => {
-				expect(parse("zero teaspoons water", "eng").quantity).to.equal(0);
-				expect(parse("one teaspoon water", "eng").quantity).to.equal(1);
-				expect(parse("twenty eight teaspoons water", "eng").quantity).to.equal(
-					28
+				expect(parse("zero teaspoons water", "eng").quantity, "zero").to.equal(
+					0
 				);
+				expect(parse("one teaspoon water", "eng").quantity, "one").to.equal(1);
+				expect(
+					parse("twenty eight teaspoons water", "eng").quantity,
+					"twenty eight"
+				).to.equal(28);
 			});
 			it("should convert dash-separated numbers", () => {
-				expect(parse("forty-six teaspoons water", "eng").quantity).to.equal(46);
+				expect(
+					parse("forty-six teaspoons water", "eng").quantity,
+					"forty-six"
+				).to.equal(46);
 			});
 			it("should convert magnitude numbers", () => {
-				expect(parse("one hundred teaspoons water", "eng").quantity).to.equal(
-					100
-				);
+				expect(
+					parse("one hundred teaspoons water", "eng").quantity,
+					"one hundred"
+				).to.equal(100);
 				expect(
 					parse(
 						"two million four hundred twenty one thousand three hundred sixty two teaspoons water",
 						"eng"
-					).quantity
+					).quantity,
+					"two million four hundred twenty one thousand three hundred sixty two"
 				).to.equal(2421362);
 			});
 			it("should convert mixed small & magnitude numbers", () => {
 				expect(
 					parse("four thousand one hundred twenty five teaspoons water", "eng")
-						.quantity
+						.quantity,
+					"four thousand one hundred twenty five"
 				).to.equal(4125);
 			});
 			it("should not fail when some keys fully contain others", () => {
-				expect(parse("fourteen teaspoons water", "eng").quantity).to.equal(14);
+				expect(
+					parse("fourteen teaspoons water", "eng").quantity,
+					"fourteen"
+				).to.equal(14);
 			});
 			it("should handle cases with `and`", () => {
 				expect(
-					parse("one hundred and five teaspoons water", "eng").quantity
+					parse("one hundred and five teaspoons water", "eng").quantity,
+					"one hundred and five"
 				).to.equal(105);
 				expect(
 					parse(
 						"three thousand one hundred and sixty eight teaspoons water",
 						"eng"
-					).quantity
+					).quantity,
+					"three thousand one hundred and sixty eight"
 				).to.equal(3168);
 				expect(
-					parse("four thousand and one teaspoons water", "eng").quantity
+					parse("four thousand and one teaspoons water", "eng").quantity,
+					"four thousand and one"
 				).to.equal(4001);
 			});
 			it("should handle adjacent magnitude numbers", () => {
 				expect(
-					parse("four hundred thousand teaspoons water", "eng").quantity
+					parse("four hundred thousand teaspoons water", "eng").quantity,
+					"four hundred thousand"
 				).to.equal(400000);
 			});
 			it("should not interfere with values found later in ingredient", () => {
@@ -109,27 +146,41 @@ describe("recipe parser eng", () => {
 					parse(
 						"three hundred fifty grams one hundred percent whole wheat flour",
 						"eng"
-					).quantity
+					).quantity,
+					"three hundred fifty grams one hundred percent whole wheat flour"
 				).to.equal(350);
 				it("should not parse words that only partially match", () => {
 					expect(
 						parse("three hundred onerously heavy bags of potatoes", "eng")
-							.quantity
+							.quantity,
+						"three hundred onerously heavy bags of potatoes"
 					).to.equal(300);
 				});
 				it("should convert written fractions", () => {
-					expect(parse("half cup flour", "eng").quantity).to.equal(0.5);
-					expect(parse("a half cup flour", "eng").quantity).to.equal(0.5);
-					expect(parse("one half cup flour", "eng").quantity).to.equal(0.5);
-					expect(parse("three quarters cup flour", "eng").quantity).to.equal(
-						0.75
+					expect(parse("half cup flour", "eng").quantity, "half").to.equal(0.5);
+					expect(parse("a half cup flour", "eng").quantity, "a half").to.equal(
+						0.5
 					);
+					expect(
+						parse("one half cup flour", "eng").quantity,
+						"one half"
+					).to.equal(0.5);
+					expect(
+						parse("three quarters cup flour", "eng").quantity,
+						"three quarters"
+					).to.equal(0.75);
 					expect(
 						parse("four and two thirds cups flour", "eng").quantity
 					).to.equal(4.666);
 					expect(parse("eight and a half cups flour", "eng").quantity).to.equal(
 						8.5
 					);
+				});
+				it("should be case-insensitive", () => {
+					expect(
+						parse("tWeNty fIve teaspoons water", "ita").quantity,
+						"tWeNty fIve"
+					).to.equal(25);
 				});
 			});
 		});
