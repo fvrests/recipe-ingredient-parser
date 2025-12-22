@@ -1,10 +1,8 @@
 import { i18nMap, SupportedLanguages } from "./i18n/index.js";
 
-function keepThreeDecimals(val: number, delimiter: string) {
-	const strVal = val.toString();
-	return (
-		strVal.split(".")[0] + delimiter + strVal.split(".")[1].substring(0, 3)
-	);
+function truncate(val: number, delimiter: string) {
+	const [whole, fractional, _] = val.toString().split(".");
+	return whole + delimiter + fractional.substring(0, 3);
 }
 
 export function convertFromFraction(
@@ -12,23 +10,26 @@ export function convertFromFraction(
 	language: SupportedLanguages
 ): string {
 	const { isCommaDelimited } = i18nMap[language];
-
 	const delimiter = isCommaDelimited ? "," : ".";
 
-	// number comes in, for example: 1 1/3
-	if (value && value.split(" ").length > 1) {
+	// no value or value has dashes
+	if (!value || value.split("-").length > 1) {
+		return value;
+	}
+
+	// has whole component (e.g. 1 1/3)
+	if (value.split(" ").length > 1) {
 		const [whole, fraction] = value.split(" ");
 		const [a, b] = fraction.split("/");
 		const remainder = parseFloat(a) / parseFloat(b);
 		const wholeAndFraction = parseInt(whole)
 			? parseInt(whole) + remainder
 			: remainder;
-		return keepThreeDecimals(wholeAndFraction, delimiter);
-	} else if (!value || value.split("-").length > 1) {
-		return value;
+		return truncate(wholeAndFraction, delimiter);
 	} else {
+		// has fraction only (e.g. 1/3)
 		const [a, b] = value.split("/");
-		return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : a;
+		return b ? truncate(parseFloat(a) / parseFloat(b), delimiter) : a;
 	}
 }
 
@@ -57,6 +58,7 @@ const unicodeObj: { [key: string]: string } = {
 	"⅑": "1/9",
 	"⅒": "1/10",
 };
+
 export function text2num(s: string, language: SupportedLanguages) {
 	const a = s.toString().split(/[\s-]+/);
 	let values: number[] = [0, 0];
